@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hostel Management System</title>
     <style>
-        /* ───────────────────────────────────────
-           GLOBAL RESET & BASE STYLES
-        ─────────────────────────────────────── */
+        /* ══════════════════════════════════════
+           GLOBAL RESET
+        ══════════════════════════════════════ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -17,9 +17,9 @@
             color: white;
         }
 
-        /* ───────────────────────────────────────
+        /* ══════════════════════════════════════
            NAVBAR
-        ─────────────────────────────────────── */
+        ══════════════════════════════════════ */
         .navbar {
             background: rgba(255,255,255,0.05);
             backdrop-filter: blur(10px);
@@ -28,317 +28,473 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 500;
         }
-        .navbar h1 { font-size: 22px; font-weight: 700; color: #e2b96f; letter-spacing: 1px; }
-        .navbar span { font-size: 13px; color: rgba(255,255,255,0.5); }
+        .navbar-left { display: flex; align-items: center; gap: 15px; }
+        .navbar h1 {
+            font-size: 20px; font-weight: 700;
+            color: #e2b96f; letter-spacing: 1px; cursor: pointer;
+        }
+        .navbar h1:hover { opacity: 0.85; }
 
-        /* Connection status indicator in navbar */
         .conn-status {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-size: 12px;
-            padding: 5px 12px;
-            border-radius: 20px;
-            background: rgba(0,0,0,0.2);
+            display: flex; align-items: center; gap: 7px;
+            font-size: 12px; padding: 5px 12px;
+            border-radius: 20px; background: rgba(0,0,0,0.2);
         }
         .conn-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: #fbbf24; /* yellow = checking */
-            animation: pulse 1.5s infinite;
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #fbbf24; animation: pulse 1.5s infinite;
         }
         .conn-dot.online  { background: #4ade80; animation: none; }
         .conn-dot.offline { background: #f87171; animation: none; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-        @keyframes pulse {
-            0%,100% { opacity: 1; }
-            50%      { opacity: 0.4; }
+        /* Hamburger menu */
+        .navbar-right { position: relative; }
+        .menu-toggle {
+            background: rgba(226,185,111,0.15);
+            border: 1.5px solid rgba(226,185,111,0.4);
+            border-radius: 10px; padding: 9px 14px;
+            cursor: pointer; display: flex;
+            flex-direction: column; gap: 5px; transition: all 0.2s;
         }
+        .menu-toggle:hover { background: rgba(226,185,111,0.3); border-color: #e2b96f; }
+        .menu-toggle span {
+            display: block; width: 22px; height: 2px;
+            background: #e2b96f; border-radius: 2px;
+        }
+        .dropdown-menu {
+            display: none; position: absolute;
+            top: calc(100% + 10px); right: 0;
+            background: #1a1a2e;
+            border: 1.5px solid rgba(226,185,111,0.3);
+            border-radius: 12px; overflow: hidden;
+            min-width: 200px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            z-index: 1000; animation: dropDown 0.2s ease;
+        }
+        @keyframes dropDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+        .dropdown-menu.open { display: block; }
+        .menu-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 20px; cursor: pointer; font-size: 14px;
+            color: rgba(255,255,255,0.8); transition: all 0.2s;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item:hover { background: rgba(226,185,111,0.15); color: #e2b96f; }
+        .menu-icon { font-size: 18px; }
 
-        /* ───────────────────────────────────────
+        /* ══════════════════════════════════════
            BREADCRUMB
-        ─────────────────────────────────────── */
+        ══════════════════════════════════════ */
         .breadcrumb {
             padding: 10px 30px;
             background: rgba(0,0,0,0.2);
-            font-size: 13px;
-            color: rgba(255,255,255,0.5);
+            font-size: 13px; color: rgba(255,255,255,0.5);
         }
         .breadcrumb span { color: #e2b96f; cursor: pointer; }
         .breadcrumb span:hover { text-decoration: underline; }
 
-        /* ───────────────────────────────────────
-           MAIN PAGE — TWO BUILDING CARDS
-        ─────────────────────────────────────── */
-        #main-page {
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
+        /* ══════════════════════════════════════
+           HOME PAGE
+        ══════════════════════════════════════ */
+        #home-page {
+            min-height: calc(100vh - 95px);
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 40px 20px; text-align: center;
         }
+        #home-page.active { display: flex; }
+        .home-icon { font-size: 80px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+        .home-title {
+            font-size: 40px; font-weight: 800; color: #e2b96f;
+            letter-spacing: 2px; margin-bottom: 12px;
+            text-shadow: 0 0 40px rgba(226,185,111,0.3);
+        }
+        .home-subtitle {
+            font-size: 16px; color: rgba(255,255,255,0.5);
+            max-width: 480px; line-height: 1.7; margin-bottom: 50px;
+        }
+        .home-cards { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; }
+        .home-card {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(226,185,111,0.25);
+            border-radius: 18px; padding: 30px 35px;
+            cursor: pointer; transition: all 0.3s; min-width: 180px; text-align: center;
+        }
+        .home-card:hover {
+            background: rgba(226,185,111,0.12); border-color: #e2b96f;
+            transform: translateY(-6px); box-shadow: 0 16px 40px rgba(226,185,111,0.2);
+        }
+        .home-card .card-icon  { font-size: 40px; margin-bottom: 12px; }
+        .home-card .card-title { font-size: 15px; font-weight: 600; color: #e2b96f; }
+        .home-card .card-desc  { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 5px; }
 
+        /* ══════════════════════════════════════
+           ROOM ALLOCATION PAGE
+        ══════════════════════════════════════ */
+        #allocation-page { display: none; }
+        #allocation-page.active { display: block; }
+
+        #main-content {
+            padding: 30px; display: flex;
+            flex-direction: column; gap: 25px;
+        }
         .page-title {
-            text-align: center;
-            font-size: 26px;
-            font-weight: 700;
-            color: #e2b96f;
-            letter-spacing: 3px;
+            text-align: center; font-size: 24px;
+            font-weight: 700; color: #e2b96f; letter-spacing: 3px;
         }
 
-        /* Big rectangle card for each building */
+        /* Building cards */
         .building-card {
             background: rgba(255,255,255,0.05);
             border: 2px solid rgba(255,255,255,0.15);
-            border-radius: 16px;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            position: relative;
-            overflow: hidden;
+            border-radius: 16px; padding: 30px;
+            display: flex; flex-direction: column; gap: 20px;
+            position: relative; overflow: hidden;
         }
-        /* Gold top border line */
         .building-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
+            content: ''; position: absolute; top: 0; left: 0;
             width: 100%; height: 5px;
             background: linear-gradient(90deg, #e2b96f, #f0c97f, #e2b96f);
         }
-
-        .building-label {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            color: #e2b96f;
-        }
-        .building-subtitle {
-            font-size: 13px;
-            color: rgba(255,255,255,0.5);
-            margin-top: -14px;
-        }
-
-        /* ───────────────────────────────────────
-           FLOOR BUTTONS (3 per building)
-        ─────────────────────────────────────── */
+        .building-label { font-size: 22px; font-weight: 700; letter-spacing: 3px; color: #e2b96f; }
+        .building-subtitle { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: -14px; }
         .floors-container { display: flex; flex-direction: column; gap: 15px; }
 
         .floor-btn {
             background: linear-gradient(135deg, rgba(226,185,111,0.15), rgba(240,201,127,0.08));
             border: 1.5px solid rgba(226,185,111,0.4);
-            border-radius: 12px;
-            padding: 22px 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            border-radius: 12px; padding: 22px 30px; cursor: pointer;
+            transition: all 0.3s; display: flex;
+            align-items: center; justify-content: space-between;
         }
         .floor-btn:hover {
             background: linear-gradient(135deg, rgba(226,185,111,0.3), rgba(240,201,127,0.2));
-            border-color: #e2b96f;
-            transform: translateY(-2px);
+            border-color: #e2b96f; transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(226,185,111,0.2);
         }
-
         .floor-btn-left h3 { font-size: 17px; font-weight: 600; color: #f0d080; margin-bottom: 4px; }
         .floor-btn-left p  { font-size: 12px; color: rgba(255,255,255,0.5); }
-
-        .floor-btn-right { display: flex; gap: 18px; align-items: center; }
-
-        /* Vacancy / filled count badges */
-        .stat-badge { text-align: center; }
-        .stat-badge .count { font-size: 20px; font-weight: 700; color: #e2b96f; }
+        .floor-btn-right   { display: flex; gap: 18px; align-items: center; }
+        .stat-badge        { text-align: center; }
+        .stat-badge .count { font-size: 20px; font-weight: 700; }
         .stat-badge .label { font-size: 11px; color: rgba(255,255,255,0.5); }
         .stat-badge.vacant .count { color: #4ade80; }
         .stat-badge.filled .count { color: #f87171; }
-
         .arrow-icon { font-size: 22px; color: rgba(255,255,255,0.4); }
 
-        /* ───────────────────────────────────────
-           FLOOR PAGE — 29 ROOMS IN ZIGZAG
-        ─────────────────────────────────────── */
-        #floor-page { display: none; padding: 25px 30px; }
+        /* ══════════════════════════════════════
+           FLOOR PAGE
+        ══════════════════════════════════════ */
+        #floor-page {
+            display: none;
+            padding: 20px 30px;
+            flex-direction: column;
+            align-items: center;
+        }
+        #floor-page.show {
+            display: flex;
+        }
 
-        .floor-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-
+        .floor-header {
+            display: flex; align-items: center; gap: 15px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
         .back-btn {
             background: rgba(226,185,111,0.2);
             border: 1.5px solid rgba(226,185,111,0.5);
-            color: #e2b96f;
-            padding: 8px 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
+            color: #e2b96f; padding: 8px 18px;
+            border-radius: 8px; cursor: pointer;
+            font-size: 14px; transition: all 0.2s;
         }
         .back-btn:hover { background: rgba(226,185,111,0.4); }
-
         .floor-title { font-size: 20px; font-weight: 700; color: #e2b96f; }
 
-        /* Legend */
-        .legend { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+        /* Legend — centred */
+        .legend {
+            display: flex; gap: 20px;
+            margin-bottom: 24px; flex-wrap: wrap;
+            justify-content: center;    /* ← centred */
+        }
         .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: rgba(255,255,255,0.6); }
         .legend-dot { width: 14px; height: 14px; border-radius: 4px; }
         .legend-dot.vacant  { background: #4ade80; }
         .legend-dot.partial { background: #fbbf24; }
         .legend-dot.full    { background: #f87171; }
 
-        /* Zigzag rows of rooms */
-        .room-row { display: flex; gap: 12px; margin-bottom: 12px; }
-        .room-row.offset { padding-left: 58px; } /* ← this offset creates the zigzag */
+        /* ══════════════════════════════════════
+           WING RECTANGLES
+           Two wide horizontal rectangles
+           stacked vertically and CENTRED on page.
+        ══════════════════════════════════════ */
 
-        /* Individual room box */
-        .room-btn {
-            width: 105px; height: 105px;
+        /* Outer wrapper centres the two wing boxes */
+        .wings-wrapper {
+            display: flex;
+            flex-direction: column;      /* Left Wing on top, Right Wing below */
+            align-items: center;         /* centres both boxes horizontally */
+            gap: 28px;
+            width: 100%;
+            padding-bottom: 30px;
+        }
+
+        /* Each wing = one wide centred rectangle
+           Fixed width so rooms always line up neatly */
+        .wing-box {
+            background: rgba(255,255,255,0.04);
+            border: 2px solid rgba(226,185,111,0.3);
+            border-radius: 18px;
+            padding: 24px 32px 30px 32px;
+            position: relative;
+            overflow: hidden;
+            width: fit-content;          /* shrink-wrap around the room grid */
+        }
+        /* Gold top accent bar */
+        .wing-box::before {
+            content: '';
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 5px;
+            background: linear-gradient(90deg, #e2b96f, #f0c97f, #e2b96f);
+        }
+
+        /* Wing heading */
+        .wing-label {
+            font-size: 13px; font-weight: 700;
+            color: #e2b96f; letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(226,185,111,0.2);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .wing-label .wing-range {
+            font-size: 12px; font-weight: 400;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 0; text-transform: none;
+        }
+
+        /* ══════════════════════════════════════
+           ZIGZAG GRID — exactly 2 ROWS per wing
+           ─────────────────────────────────────
+           LEFT WING (15 rooms):
+             Row 0 (even): [R1][R2][R3][R4][R5][R6][R7][R8]   8 rooms
+             Row 1 (odd):    [R9][R10][R11][R12][R13][R14][R15]  7 rooms, shifted
+
+           RIGHT WING (14 rooms):
+             Row 0 (even): [R16][R17][R18][R19][R20][R21][R22]  7 rooms
+             Row 1 (odd):    [R23][R24][R25][R26][R27][R28][R29] 7 rooms, shifted
+
+           Row 1 (the odd/second row) is shifted right by
+           half a room-width to create the zigzag pattern.
+           shift = (room-width + gap) / 2 = (90 + 12) / 2 = 51px
+        ══════════════════════════════════════ */
+        .zigzag-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* One horizontal row of room boxes */
+        .zz-row {
+            display: flex;
+            flex-direction: row;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* Second row shifted right → zigzag effect */
+        .zz-row.shifted {
+            padding-left: 51px;   /* (90px room + 12px gap) / 2 */
+        }
+
+        /* ── Individual square room box ── */
+        .room-box {
+            width: 90px;
+            height: 90px;
             border-radius: 12px;
             border: 2px solid;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.22s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
             flex-shrink: 0;
         }
 
-        /* Green = vacant slots available */
-        .room-btn.vacant {
+        /* Green — vacant */
+        .room-box.vacant {
             background: linear-gradient(135deg, rgba(74,222,128,0.15), rgba(74,222,128,0.05));
             border-color: rgba(74,222,128,0.5);
         }
-        .room-btn.vacant:hover {
-            background: linear-gradient(135deg, rgba(74,222,128,0.3), rgba(74,222,128,0.15));
+        .room-box.vacant:hover {
+            background: linear-gradient(135deg, rgba(74,222,128,0.32), rgba(74,222,128,0.14));
             border-color: #4ade80;
-            transform: scale(1.07);
-            box-shadow: 0 8px 20px rgba(74,222,128,0.3);
+            transform: scale(1.09);
+            box-shadow: 0 8px 24px rgba(74,222,128,0.35);
         }
 
-        /* Red = completely full */
-        .room-btn.full {
+        /* Red — full */
+        .room-box.full {
             background: linear-gradient(135deg, rgba(248,113,113,0.15), rgba(248,113,113,0.05));
             border-color: rgba(248,113,113,0.4);
             cursor: not-allowed;
+            opacity: 0.65;
         }
 
-        /* Yellow = some students, still has space */
-        .room-btn.partial {
+        /* Yellow — partial */
+        .room-box.partial {
             background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(251,191,36,0.05));
             border-color: rgba(251,191,36,0.5);
         }
-        .room-btn.partial:hover {
-            background: linear-gradient(135deg, rgba(251,191,36,0.3), rgba(251,191,36,0.15));
+        .room-box.partial:hover {
+            background: linear-gradient(135deg, rgba(251,191,36,0.32), rgba(251,191,36,0.14));
             border-color: #fbbf24;
-            transform: scale(1.07);
-            box-shadow: 0 8px 20px rgba(251,191,36,0.3);
+            transform: scale(1.09);
+            box-shadow: 0 8px 24px rgba(251,191,36,0.35);
         }
 
-        .room-number { font-size: 13px; font-weight: 700; color: white; }
+        /* Room number label inside box */
+        .room-num {
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            line-height: 1.3;
+        }
 
-        .room-icons { display: flex; gap: 8px; align-items: center; }
-        .icon-group { display: flex; flex-direction: column; align-items: center; gap: 1px; }
-        .icon-group .icon { font-size: 15px; }
-        .icon-group .num  { font-size: 10px; font-weight: 600; }
-        .num.green { color: #4ade80; }
-        .num.red   { color: #f87171; }
-
-        /* ───────────────────────────────────────
-           MODAL — STUDENT FORM
-        ─────────────────────────────────────── */
-        .modal-overlay {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.75);
-            z-index: 1000;
+        /* V / F badges inside box */
+        .room-icons {
+            display: flex;
+            gap: 6px;
             align-items: center;
-            justify-content: center;
         }
-        .modal-overlay.active { display: flex; }
-
-        .modal {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 2px solid rgba(226,185,111,0.4);
-            border-radius: 20px;
-            padding: 35px;
-            width: 90%; max-width: 540px;
-            max-height: 90vh; overflow-y: auto;
-            position: relative;
-            animation: slideIn 0.3s ease;
+        .icon-grp {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
         }
-        @keyframes slideIn {
-            from { transform: translateY(-30px); opacity: 0; }
-            to   { transform: translateY(0);     opacity: 1; }
+        .icon-grp .ico  { font-size: 13px; }
+        .icon-grp .cnt  { font-size: 10px; font-weight: 700; }
+        .cnt.green { color: #4ade80; }
+        .cnt.red   { color: #f87171; }
+
+        /* ══════════════════════════════════════
+           ADD WARDEN PAGE
+        ══════════════════════════════════════ */
+        #warden-page { display: none; padding: 30px; }
+        #warden-page.active { display: block; }
+        .warden-container { max-width: 560px; margin: 0 auto; }
+        .warden-title { font-size: 24px; font-weight: 700; color: #e2b96f; margin-bottom: 5px; }
+        .warden-subtitle { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 30px; }
+        .warden-form-card {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(226,185,111,0.2);
+            border-radius: 18px; padding: 35px;
+            position: relative; overflow: hidden;
+        }
+        .warden-form-card::before {
+            content: ''; position: absolute; top: 0; left: 0;
+            width: 100%; height: 5px;
+            background: linear-gradient(90deg, #e2b96f, #f0c97f, #e2b96f);
+        }
+        .warden-list-title { font-size: 18px; font-weight: 600; color: #e2b96f; margin: 30px 0 15px; }
+        .warden-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 16px 20px;
+            margin-bottom: 12px; display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        .warden-card-left h4 { font-size: 15px; font-weight: 600; color: #f0d080; }
+        .warden-card-left p  { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+        .warden-block-badge {
+            background: rgba(226,185,111,0.2); border: 1px solid rgba(226,185,111,0.4);
+            color: #e2b96f; padding: 4px 14px; border-radius: 20px;
+            font-size: 13px; font-weight: 600;
         }
 
-        .modal h2 { color: #e2b96f; font-size: 20px; margin-bottom: 5px; }
-        .modal-sub { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 25px; }
-
-        .close-btn {
-            position: absolute; top: 18px; right: 20px;
-            background: none; border: none;
-            color: rgba(255,255,255,0.5);
-            font-size: 24px; cursor: pointer;
-        }
-        .close-btn:hover { color: white; }
-
-        /* Form fields */
+        /* ══════════════════════════════════════
+           SHARED FORM STYLES
+        ══════════════════════════════════════ */
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
-
         .form-group input,
         .form-group select {
-            width: 100%;
-            padding: 11px 15px;
+            width: 100%; padding: 11px 15px;
             background: rgba(255,255,255,0.08);
             border: 1.5px solid rgba(255,255,255,0.15);
-            border-radius: 9px;
-            color: white;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
+            border-radius: 9px; color: white;
+            font-size: 14px; outline: none; transition: border-color 0.2s;
         }
         .form-group input:focus,
         .form-group select:focus { border-color: #e2b96f; background: rgba(255,255,255,0.12); }
-
-        .form-group input[readonly] {
-            opacity: 0.7;
-            cursor: default;
-            background: rgba(255,255,255,0.04);
-        }
-
+        .form-group input[readonly] { opacity: 0.65; cursor: default; background: rgba(255,255,255,0.04); }
         .form-group select option { background: #1a1a2e; }
-
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
         .submit-btn {
             width: 100%; padding: 13px;
             background: linear-gradient(135deg, #e2b96f, #c9962d);
             border: none; border-radius: 10px;
             color: #1a1a2e; font-size: 16px; font-weight: 700;
-            cursor: pointer; margin-top: 10px;
-            transition: all 0.2s;
+            cursor: pointer; margin-top: 8px; transition: all 0.2s;
         }
         .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(226,185,111,0.4); }
         .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        /* ───────────────────────────────────────
-           TOAST NOTIFICATION
-        ─────────────────────────────────────── */
+        /* ══════════════════════════════════════
+           MODAL
+        ══════════════════════════════════════ */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.78); z-index: 1000;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 2px solid rgba(226,185,111,0.4);
+            border-radius: 20px; padding: 35px;
+            width: 90%; max-width: 540px;
+            max-height: 90vh; overflow-y: auto;
+            position: relative; animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from{transform:translateY(-30px);opacity:0} to{transform:translateY(0);opacity:1} }
+        .modal h2 { color: #e2b96f; font-size: 20px; margin-bottom: 5px; }
+        .modal-sub { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 25px; }
+        .close-btn {
+            position: absolute; top: 18px; right: 20px;
+            background: none; border: none;
+            color: rgba(255,255,255,0.5); font-size: 24px; cursor: pointer;
+        }
+        .close-btn:hover { color: white; }
+        .form-section-title {
+            font-size: 13px; font-weight: 600; color: #e2b96f;
+            letter-spacing: 1px; text-transform: uppercase;
+            margin: 20px 0 12px; padding-bottom: 6px;
+            border-bottom: 1px solid rgba(226,185,111,0.2);
+        }
+
+        /* ══════════════════════════════════════
+           TOAST
+        ══════════════════════════════════════ */
         .toast {
             position: fixed; bottom: 30px; right: 30px;
-            padding: 14px 22px;
-            border-radius: 10px;
+            padding: 14px 22px; border-radius: 10px;
             font-weight: 600; font-size: 14px;
-            display: none; z-index: 2000;
+            display: none; z-index: 3000; max-width: 340px;
             animation: fadeIn 0.3s ease;
-            max-width: 320px;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
         /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
@@ -347,162 +503,258 @@
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════
+<!-- ════════════════════════════════════════
      NAVBAR
-═══════════════════════════════════════════ -->
+════════════════════════════════════════ -->
 <div class="navbar">
-    <h1>🏢 Hostel Management System</h1>
-    <div class="conn-status" id="conn-status">
-        <div class="conn-dot" id="conn-dot"></div>
-        <span id="conn-text">Checking...</span>
+    <div class="navbar-left">
+        <h1 onclick="showPage('home')">🏢 Hostel Management</h1>
+        <div class="conn-status" id="conn-status">
+            <div class="conn-dot" id="conn-dot"></div>
+            <span id="conn-text">Checking...</span>
+        </div>
+    </div>
+    <div class="navbar-right">
+        <div class="menu-toggle" id="menu-toggle" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </div>
+        <div class="dropdown-menu" id="dropdown-menu">
+            <div class="menu-item" onclick="showPage('allocation'); closeMenu()">
+                <span class="menu-icon">🏠</span> Room Allocation
+            </div>
+            <div class="menu-item" onclick="showPage('warden'); closeMenu()">
+                <span class="menu-icon">👨‍💼</span> Add Warden
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- BREADCRUMB -->
 <div class="breadcrumb" id="breadcrumb">
-    <span onclick="goHome()">🏠 Home</span>
+    <span onclick="showPage('home')">🏠 Home</span>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     MAIN PAGE — TWO BUILDINGS
-═══════════════════════════════════════════ -->
-<div id="main-page">
-    <div class="page-title">SELECT BLOCK</div>
 
-    <!-- ── D BLOCK ── -->
-    <div class="building-card">
-        <div>
-            <div class="building-label">D Block</div>
-            <div class="building-subtitle">3 Floors &bull; 29 Rooms per Floor &bull; 87 Total Rooms</div>
-        </div>
-        <div class="floors-container">
-            <div class="floor-btn" onclick="openFloor('D','Ground Floor',0)">
-                <div class="floor-btn-left">
-                    <h3>🏠 Ground Floor</h3>
-                    <p>Floor Level 0 &bull; D Block</p>
-                </div>
-                <div class="floor-btn-right">
-                    <div class="stat-badge vacant"><div class="count" id="D-0-vacant">--</div><div class="label">Vacant</div></div>
-                    <div class="stat-badge filled"><div class="count" id="D-0-filled">--</div><div class="label">Filled</div></div>
-                    <div class="arrow-icon">›</div>
-                </div>
-            </div>
-            <div class="floor-btn" onclick="openFloor('D','First Floor',1)">
-                <div class="floor-btn-left">
-                    <h3>🔼 First Floor</h3>
-                    <p>Floor Level 1 &bull; D Block</p>
-                </div>
-                <div class="floor-btn-right">
-                    <div class="stat-badge vacant"><div class="count" id="D-1-vacant">--</div><div class="label">Vacant</div></div>
-                    <div class="stat-badge filled"><div class="count" id="D-1-filled">--</div><div class="label">Filled</div></div>
-                    <div class="arrow-icon">›</div>
-                </div>
-            </div>
-            <div class="floor-btn" onclick="openFloor('D','Second Floor',2)">
-                <div class="floor-btn-left">
-                    <h3>🔼 Second Floor</h3>
-                    <p>Floor Level 2 &bull; D Block</p>
-                </div>
-                <div class="floor-btn-right">
-                    <div class="stat-badge vacant"><div class="count" id="D-2-vacant">--</div><div class="label">Vacant</div></div>
-                    <div class="stat-badge filled"><div class="count" id="D-2-filled">--</div><div class="label">Filled</div></div>
-                    <div class="arrow-icon">›</div>
-                </div>
-            </div>
-        </div>
+<!-- ════════════════════════════════════════
+     PAGE 1 — HOME
+════════════════════════════════════════ -->
+<div id="home-page" class="active">
+    <div class="home-icon">🏢</div>
+    <div class="home-title">Welcome to Hostel Management</div>
+    <div class="home-subtitle">
+        Manage student room allocations, wardens, and hostel operations
+        efficiently from one place.
     </div>
-
-    <!-- ── L BLOCK ── -->
-    <div class="building-card">
-        <div>
-            <div class="building-label">L Block</div>
-            <div class="building-subtitle">3 Floors &bull; 29 Rooms per Floor &bull; 87 Total Rooms</div>
+    <div class="home-cards">
+        <div class="home-card" onclick="showPage('allocation')">
+            <div class="card-icon">🛏️</div>
+            <div class="card-title">Room Allocation</div>
+            <div class="card-desc">View &amp; allocate rooms for students</div>
         </div>
-        <div class="floors-container">
-            <div class="floor-btn" onclick="openFloor('L','Ground Floor',0)">
-                <div class="floor-btn-left">
-                    <h3>🏠 Ground Floor</h3>
-                    <p>Floor Level 0 &bull; L Block</p>
-                </div>
-                <div class="floor-btn-right">
-                    <div class="stat-badge vacant"><div class="count" id="L-0-vacant">--</div><div class="label">Vacant</div></div>
-                    <div class="stat-badge filled"><div class="count" id="L-0-filled">--</div><div class="label">Filled</div></div>
-                    <div class="arrow-icon">›</div>
-                </div>
-            </div>
-            <div class="floor-btn" onclick="openFloor('L','First Floor',1)">
-                <div class="floor-btn-left">
-                    <h3>🔼 First Floor</h3>
-                    <p>Floor Level 1 &bull; L Block</p>
-                </div>
-                <div class="floor-btn-right">
-                    <div class="stat-badge vacant"><div class="count" id="L-1-vacant">--</div><div class="label">Vacant</div></div>
-                    <div class="stat-badge filled"><div class="count" id="L-1-filled">--</div><div class="label">Filled</div></div>
-                    <div class="arrow-icon">›</div>
-                </div>
-            </div>
-            <div class="floor-btn" onclick="openFloor('L','Second Floor',2)">
-                <div class="floor-btn-left">
-                    <h3>🔼 Second Floor</h3>
-                    <p>Floor Level 2 &bull; L Block</p>
-                </div>
-                <div class="floor-btn-right">
-                    <div class="stat-badge vacant"><div class="count" id="L-2-vacant">--</div><div class="label">Vacant</div></div>
-                    <div class="stat-badge filled"><div class="count" id="L-2-filled">--</div><div class="label">Filled</div></div>
-                    <div class="arrow-icon">›</div>
-                </div>
-            </div>
+        <div class="home-card" onclick="showPage('warden')">
+            <div class="card-icon">👨‍💼</div>
+            <div class="card-title">Add Warden</div>
+            <div class="card-desc">Register a new warden for a block</div>
         </div>
     </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     FLOOR PAGE — 29 ROOMS ZIGZAG
-═══════════════════════════════════════════ -->
-<div id="floor-page">
-    <div class="floor-header">
-        <button class="back-btn" onclick="goHome()">← Back</button>
-        <div class="floor-title" id="floor-title">Floor View</div>
+
+<!-- ════════════════════════════════════════
+     PAGE 2 — ROOM ALLOCATION
+════════════════════════════════════════ -->
+<div id="allocation-page">
+
+    <!-- Building selection view -->
+    <div id="main-content">
+        <div class="page-title">SELECT BLOCK</div>
+
+        <!-- D BLOCK -->
+        <div class="building-card">
+            <div>
+                <div class="building-label">D Block</div>
+                <div class="building-subtitle">3 Floors &bull; 29 Rooms per Floor &bull; Rooms 1–87 (sequential)</div>
+            </div>
+            <div class="floors-container">
+                <div class="floor-btn" onclick="openFloor('D','Ground Floor',0)">
+                    <div class="floor-btn-left"><h3>🏠 Ground Floor</h3><p>Rooms 1–29 &bull; D Block</p></div>
+                    <div class="floor-btn-right">
+                        <div class="stat-badge vacant"><div class="count" id="D-0-vacant">--</div><div class="label">Vacant</div></div>
+                        <div class="stat-badge filled"><div class="count" id="D-0-filled">--</div><div class="label">Filled</div></div>
+                        <div class="arrow-icon">›</div>
+                    </div>
+                </div>
+                <div class="floor-btn" onclick="openFloor('D','First Floor',1)">
+                    <div class="floor-btn-left"><h3>🔼 First Floor</h3><p>Rooms 30–58 &bull; D Block</p></div>
+                    <div class="floor-btn-right">
+                        <div class="stat-badge vacant"><div class="count" id="D-1-vacant">--</div><div class="label">Vacant</div></div>
+                        <div class="stat-badge filled"><div class="count" id="D-1-filled">--</div><div class="label">Filled</div></div>
+                        <div class="arrow-icon">›</div>
+                    </div>
+                </div>
+                <div class="floor-btn" onclick="openFloor('D','Second Floor',2)">
+                    <div class="floor-btn-left"><h3>🔼 Second Floor</h3><p>Rooms 59–87 &bull; D Block</p></div>
+                    <div class="floor-btn-right">
+                        <div class="stat-badge vacant"><div class="count" id="D-2-vacant">--</div><div class="label">Vacant</div></div>
+                        <div class="stat-badge filled"><div class="count" id="D-2-filled">--</div><div class="label">Filled</div></div>
+                        <div class="arrow-icon">›</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- L BLOCK -->
+        <div class="building-card">
+            <div>
+                <div class="building-label">L Block</div>
+                <div class="building-subtitle">3 Floors &bull; 29 Rooms per Floor &bull; Rooms 1–87 (sequential)</div>
+            </div>
+            <div class="floors-container">
+                <div class="floor-btn" onclick="openFloor('L','Ground Floor',0)">
+                    <div class="floor-btn-left"><h3>🏠 Ground Floor</h3><p>Rooms 1–29 &bull; L Block</p></div>
+                    <div class="floor-btn-right">
+                        <div class="stat-badge vacant"><div class="count" id="L-0-vacant">--</div><div class="label">Vacant</div></div>
+                        <div class="stat-badge filled"><div class="count" id="L-0-filled">--</div><div class="label">Filled</div></div>
+                        <div class="arrow-icon">›</div>
+                    </div>
+                </div>
+                <div class="floor-btn" onclick="openFloor('L','First Floor',1)">
+                    <div class="floor-btn-left"><h3>🔼 First Floor</h3><p>Rooms 30–58 &bull; L Block</p></div>
+                    <div class="floor-btn-right">
+                        <div class="stat-badge vacant"><div class="count" id="L-1-vacant">--</div><div class="label">Vacant</div></div>
+                        <div class="stat-badge filled"><div class="count" id="L-1-filled">--</div><div class="label">Filled</div></div>
+                        <div class="arrow-icon">›</div>
+                    </div>
+                </div>
+                <div class="floor-btn" onclick="openFloor('L','Second Floor',2)">
+                    <div class="floor-btn-left"><h3>🔼 Second Floor</h3><p>Rooms 59–87 &bull; L Block</p></div>
+                    <div class="floor-btn-right">
+                        <div class="stat-badge vacant"><div class="count" id="L-2-vacant">--</div><div class="label">Vacant</div></div>
+                        <div class="stat-badge filled"><div class="count" id="L-2-filled">--</div><div class="label">Filled</div></div>
+                        <div class="arrow-icon">›</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="legend">
-        <div class="legend-item"><div class="legend-dot vacant"></div>  Vacant — click to allocate</div>
-        <div class="legend-item"><div class="legend-dot partial"></div> Partial — click to allocate more</div>
-        <div class="legend-item"><div class="legend-dot full"></div>    Full — no more slots</div>
+
+    <!-- ── FLOOR VIEW — shown when floor button is clicked ── -->
+    <div id="floor-page">
+        <div class="floor-header">
+            <button class="back-btn" onclick="backToBuildings()">← Back</button>
+            <div class="floor-title" id="floor-title">Floor View</div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item"><div class="legend-dot vacant"></div>  Vacant — click to allocate</div>
+            <div class="legend-item"><div class="legend-dot partial"></div> Partial — click to add more</div>
+            <div class="legend-item"><div class="legend-dot full"></div>    Full — no slots left</div>
+        </div>
+
+        <!--
+            TWO WING RECTANGLES stacked one above the other (vertical):
+            ┌─────────────── LEFT WING ──────────────────┐
+            │  [R1][R2][R3][R4][R5]                      │
+            │     [R6][R7][R8][R9][R10]   ← zigzag       │
+            │  [R11]...                                   │
+            └─────────────────────────────────────────────┘
+            ┌─────────────── RIGHT WING ─────────────────┐
+            │  [R16][R17]...                              │
+            └─────────────────────────────────────────────┘
+        -->
+        <div class="wings-wrapper">
+
+            <!-- LEFT WING RECTANGLE (rooms 1–15 of this floor) -->
+            <div class="wing-box">
+                <div class="wing-label" id="left-wing-label">
+                    🏠 Left Wing
+                    <span class="wing-range" id="left-wing-range"></span>
+                </div>
+                <!-- zigzag grid built by JS -->
+                <div class="zigzag-grid" id="left-wing-grid"></div>
+            </div>
+
+            <!-- RIGHT WING RECTANGLE (rooms 16–29 of this floor) -->
+            <div class="wing-box">
+                <div class="wing-label" id="right-wing-label">
+                    🏠 Right Wing
+                    <span class="wing-range" id="right-wing-range"></span>
+                </div>
+                <div class="zigzag-grid" id="right-wing-grid"></div>
+            </div>
+
+        </div>
     </div>
-    <!-- Rooms rendered by JavaScript -->
-    <div id="rooms-container"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     STUDENT REGISTRATION MODAL
-═══════════════════════════════════════════ -->
+
+<!-- ════════════════════════════════════════
+     PAGE 3 — ADD WARDEN
+════════════════════════════════════════ -->
+<div id="warden-page">
+    <div class="warden-container">
+        <div class="warden-title">👨‍💼 Add Warden</div>
+        <div class="warden-subtitle">Register a new warden for a hostel block</div>
+        <div class="warden-form-card">
+            <form id="warden-form" onsubmit="submitWardenForm(event)">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="w-name" placeholder="Enter warden full name" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="w-email" placeholder="warden@hostel.edu" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone *</label>
+                        <input type="tel" id="w-phone" placeholder="10-digit phone" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Assigned Block *</label>
+                    <select id="w-block" required>
+                        <option value="">Select Block</option>
+                        <option value="D">D Block</option>
+                        <option value="L">L Block</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn" id="warden-submit-btn">➕ Add Warden</button>
+            </form>
+        </div>
+        <div class="warden-list-title">📋 Existing Wardens</div>
+        <div id="warden-list">
+            <p style="color:rgba(255,255,255,0.4);font-size:13px;">Loading wardens...</p>
+        </div>
+    </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     STUDENT ALLOCATION MODAL
+     NOTE: student_id field removed as requested
+════════════════════════════════════════ -->
 <div class="modal-overlay" id="modal-overlay">
     <div class="modal">
         <button class="close-btn" onclick="closeModal()">✕</button>
         <h2>🎓 Student Room Allocation</h2>
-        <div class="modal-sub">Fill in the student details below to allocate the room</div>
+        <div class="modal-sub">Fill in student and parent details to allocate the room</div>
 
-        <form id="student-form" onsubmit="submitForm(event)">
+        <form id="student-form" onsubmit="submitStudentForm(event)">
 
-            <!-- Row 1: Student ID + Roll Number -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Student ID *</label>
-                    <input type="text" id="student_id" placeholder="e.g. STU001" required>
-                </div>
-                <div class="form-group">
-                    <label>Roll Number *</label>
-                    <input type="text" id="roll_number" placeholder="e.g. 22CS001" required>
-                </div>
+            <!-- ── STUDENT DETAILS ── -->
+            <div class="form-section-title">Student Details</div>
+
+            <div class="form-group">
+                <label>Roll Number *</label>
+                <input type="text" id="roll_number" placeholder="e.g. 22CS001" required>
             </div>
 
-            <!-- Full Name -->
             <div class="form-group">
                 <label>Full Name *</label>
-                <input type="text" id="student_name" placeholder="Enter full name" required>
+                <input type="text" id="student_name" placeholder="Student full name" required>
             </div>
 
-            <!-- Row 2: Department + Year -->
             <div class="form-row">
                 <div class="form-group">
                     <label>Department *</label>
@@ -513,7 +765,7 @@
                         <option>Electrical Engineering</option>
                         <option>Mechanical Engineering</option>
                         <option>Civil Engineering</option>
-                        <option>Electronics & Communication</option>
+                        <option>Electronics &amp; Communication</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -528,297 +780,356 @@
                 </div>
             </div>
 
-            <!-- Phone -->
             <div class="form-group">
-                <label>Phone Number *</label>
-                <input type="tel" id="phone" placeholder="Enter 10-digit phone number" required>
+                <label>Student Phone *</label>
+                <input type="tel" id="phone" placeholder="Student phone number" required>
             </div>
 
-            <!-- Row 3: Block + Floor (auto-filled, readonly) -->
+            <!-- ── PARENT / GUARDIAN DETAILS ── -->
+            <div class="form-section-title">Parent / Guardian Details</div>
+
+            <div class="form-group">
+                <label>Parent ID *</label>
+                <input type="text" id="parent_id" placeholder="e.g. PAR001" required>
+            </div>
+
+            <div class="form-group">
+                <label>Parent / Guardian Name *</label>
+                <input type="text" id="parent_name" placeholder="Parent full name" required>
+            </div>
+
             <div class="form-row">
                 <div class="form-group">
-                    <label>Block (Auto-filled)</label>
+                    <label>Parent Phone *</label>
+                    <input type="tel" id="parent_phone" placeholder="Parent phone number" required>
+                </div>
+                <div class="form-group">
+                    <label>Relation</label>
+                    <select id="parent_relation">
+                        <option value="Father">Father</option>
+                        <option value="Mother">Mother</option>
+                        <option value="Guardian">Guardian</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ── ROOM DETAILS (auto-filled, readonly) ── -->
+            <div class="form-section-title">Room Details (Auto-filled)</div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Block</label>
                     <input type="text" id="block" readonly>
                 </div>
                 <div class="form-group">
-                    <label>Floor (Auto-filled)</label>
+                    <label>Floor</label>
                     <input type="text" id="floor_name" readonly>
                 </div>
             </div>
-
-            <!-- Row 4: Room Number + Floor Index hidden -->
             <div class="form-row">
                 <div class="form-group">
-                    <label>Room Number (Auto-filled)</label>
+                    <label>Room Number</label>
                     <input type="text" id="room_number" readonly>
                 </div>
                 <div class="form-group">
-                    <label>Floor Index (for DB)</label>
-                    <!-- This hidden field sends the numeric floor (0,1,2) to backend -->
-                    <input type="text" id="floor_index" readonly style="opacity:0.5;">
+                    <label>Floor Index (DB)</label>
+                    <input type="text" id="floor_index" readonly style="opacity:0.4;">
                 </div>
             </div>
 
-            <button type="submit" class="submit-btn" id="submit-btn">
-                ✅ Allocate Room
-            </button>
+            <button type="submit" class="submit-btn" id="submit-btn">✅ Allocate Room</button>
         </form>
     </div>
 </div>
 
-<!-- TOAST -->
+<!-- TOAST NOTIFICATION -->
 <div class="toast" id="toast"></div>
 
 
-<!-- ═══════════════════════════════════════════
-     JAVASCRIPT — ALL LOGIC
-═══════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════ -->
 <script>
 
-// ──────────────────────────────────────────
-// CONSTANTS & STATE
-// ──────────────────────────────────────────
-const ROOM_CAPACITY = 3;   // Max students per room
-const TOTAL_ROOMS   = 29;  // Rooms per floor
-const BACKEND_URL   = '';  // Empty = same server (http://localhost:5000)
-                            // If Flask runs elsewhere, put full URL here
+// ─────────────────────────────────────────
+// CONSTANTS
+// ─────────────────────────────────────────
+const ROOM_CAPACITY = 3;
+const TOTAL_ROOMS   = 29;          // rooms per floor
+const BACKEND_URL   = '';          // same server → http://localhost:5000
+const FLOOR_NAMES   = { 0: 'Ground Floor', 1: 'First Floor', 2: 'Second Floor' };
 
-// roomData stores student count per room in memory
-// Structure: roomData['D'][0][5] = { students: 2 }
-//                      block floor room
-let roomData = {};
+// Sequential room offsets across floors
+// Ground: 1–29  (offset 0)
+// First:  30–58 (offset 29)
+// Second: 59–87 (offset 58)
+const FLOOR_OFFSET = { 0: 0, 1: 29, 2: 58 };
 
-// Track which floor/block is currently open
+// Split 29 rooms: Left wing = 15, Right wing = 14
+const LEFT_COUNT  = 15;
+const RIGHT_COUNT = 14;
+
+// 2 rows per wing:
+// Left wing  (15 rooms): Row 0 = 8 rooms,  Row 1 = 7 rooms
+// Right wing (14 rooms): Row 0 = 7 rooms,  Row 1 = 7 rooms
+// We calculate row split per wing inside renderOneWing()
+const ROOMS_PER_ROW = 8;  // default (overridden per wing)
+
+// App state
+let roomData          = {};
 let currentBlock      = '';
-let currentFloor      = '';
 let currentFloorIndex = 0;
-let selectedRoomNum   = 0;
-
-// Floor index → display name mapping
-const FLOOR_NAMES = { 0: 'Ground Floor', 1: 'First Floor', 2: 'Second Floor' };
+let selectedRoomNum   = 0;   // absolute room number (1–87)
 
 
-// ──────────────────────────────────────────
-// STEP 1: INITIALISE ROOM DATA STRUCTURE
-// Creates empty slots for all 6 floors
-// (2 blocks × 3 floors × 29 rooms each)
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════
+// INIT — build empty room data structure
+// roomData['D'][0][5] = { students: 2 }
+//         block floor absRoom
+// ══════════════════════════════════════════
 function initRoomData() {
     ['D', 'L'].forEach(block => {
         roomData[block] = {};
         [0, 1, 2].forEach(floor => {
             roomData[block][floor] = {};
+            const off = FLOOR_OFFSET[floor];
             for (let r = 1; r <= TOTAL_ROOMS; r++) {
-                roomData[block][floor][r] = { students: 0 };
+                roomData[block][floor][off + r] = { students: 0 };
             }
         });
     });
 }
 
 
-// ──────────────────────────────────────────
-// STEP 2: CHECK BACKEND CONNECTION
-// Pings /api/room_stats to see if Flask is running
-// Updates the green/red dot in the navbar
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════
+// CHECK BACKEND — ping Flask, load room data
+// ══════════════════════════════════════════
 async function checkBackendConnection() {
     const dot  = document.getElementById('conn-dot');
     const text = document.getElementById('conn-text');
     try {
-        // Try to reach Flask backend
         const res = await fetch(BACKEND_URL + '/api/room_stats');
         if (res.ok) {
-            // ✅ Backend is online
-            dot.className  = 'conn-dot online';
+            dot.className    = 'conn-dot online';
             text.textContent = 'Connected to Database';
-
-            // Load real data from MySQL
             const data = await res.json();
-            applyRoomStats(data);
-        } else {
-            throw new Error('Non-OK response');
-        }
-    } catch (e) {
-        // ❌ Backend is offline
-        dot.className  = 'conn-dot offline';
-        text.textContent = 'No Backend (Demo Mode)';
-        console.warn('Backend not reachable. Running in demo mode.');
-        // Demo mode: all rooms start empty
+            data.forEach(row => {
+                const b = row.block, f = row.floor, r = row.room_number;
+                if (roomData[b]?.[f]?.[r] !== undefined) {
+                    roomData[b][f][r].students = row.student_count;
+                }
+            });
+        } else { throw new Error(); }
+    } catch {
+        dot.className    = 'conn-dot offline';
+        text.textContent = 'Demo Mode (No DB)';
     }
     updateAllBadges();
 }
 
 
-// ──────────────────────────────────────────
-// APPLY ROOM STATS FROM BACKEND RESPONSE
-// Takes the JSON array from /api/room_stats
-// and writes student counts into roomData[]
-// ──────────────────────────────────────────
-function applyRoomStats(data) {
-    // data = [ {block:"D", floor:0, room_number:5, student_count:2}, ... ]
-    data.forEach(row => {
-        const b = row.block;
-        const f = row.floor;
-        const r = row.room_number;
-        if (roomData[b] && roomData[b][f] && roomData[b][f][r] !== undefined) {
-            roomData[b][f][r].students = row.student_count;
-        }
-    });
-}
-
-
-// ──────────────────────────────────────────
-// UPDATE VACANCY/FILLED BADGES
-// Recalculates and updates the count numbers
-// on each floor button on the main page
-// ──────────────────────────────────────────
+// Update Vacant/Filled count badges on the floor buttons
 function updateAllBadges() {
     ['D', 'L'].forEach(block => {
         [0, 1, 2].forEach(floor => {
-            let filledRooms  = 0;
-            let vacantRooms  = 0;
+            let filled = 0, vacant = 0;
+            const off = FLOOR_OFFSET[floor];
             for (let r = 1; r <= TOTAL_ROOMS; r++) {
-                const s = roomData[block][floor][r].students;
-                if (s >= ROOM_CAPACITY) filledRooms++;
-                else vacantRooms++;
+                (roomData[block][floor][off + r]?.students ?? 0) >= ROOM_CAPACITY
+                    ? filled++ : vacant++;
             }
-            document.getElementById(`${block}-${floor}-vacant`).textContent = vacantRooms;
-            document.getElementById(`${block}-${floor}-filled`).textContent = filledRooms;
+            document.getElementById(`${block}-${floor}-vacant`).textContent = vacant;
+            document.getElementById(`${block}-${floor}-filled`).textContent = filled;
         });
     });
 }
 
 
-// ──────────────────────────────────────────
-// OPEN A FLOOR
-// Hides main page, shows floor with 29 rooms
-// Called when user clicks a floor button
-// ──────────────────────────────────────────
-function openFloor(block, floorName, floorIndex) {
-    currentBlock      = block;
-    currentFloor      = floorName;
-    currentFloorIndex = floorIndex;
+// ══════════════════════════════════════════
+// PAGE NAVIGATION
+// ══════════════════════════════════════════
+function showPage(page) {
+    ['home-page', 'allocation-page', 'warden-page'].forEach(id => {
+        document.getElementById(id).classList.remove('active');
+        document.getElementById(id).style.display = '';
+    });
+    document.getElementById('floor-page').classList.remove('show');
+    document.getElementById('main-content').style.display = 'flex';
 
-    document.getElementById('main-page').style.display  = 'none';
-    document.getElementById('floor-page').style.display = 'block';
+    const bc = document.getElementById('breadcrumb');
 
-    document.getElementById('floor-title').textContent = `${block} Block — ${floorName}`;
-    document.getElementById('breadcrumb').innerHTML =
-        `<span onclick="goHome()">🏠 Home</span> › ${block} Block › ${floorName}`;
-
-    renderRooms(block, floorIndex);
-}
-
-
-// ──────────────────────────────────────────
-// GO HOME
-// Hides floor view, shows main building page
-// ──────────────────────────────────────────
-function goHome() {
-    document.getElementById('floor-page').style.display  = 'none';
-    document.getElementById('main-page').style.display   = 'flex';
-    document.getElementById('breadcrumb').innerHTML =
-        `<span onclick="goHome()">🏠 Home</span>`;
-}
-
-
-// ──────────────────────────────────────────
-// RENDER 29 ROOMS IN ZIGZAG PATTERN
-//
-// Layout: rows of 5 rooms, alternating offset
-//   Row 1 (rooms  1–5):  no indent  → normal
-//   Row 2 (rooms  6–10): indent     → shifted right
-//   Row 3 (rooms 11–15): no indent
-//   Row 4 (rooms 16–20): indent
-//   Row 5 (rooms 21–25): no indent
-//   Row 6 (rooms 26–29): indent (only 4 rooms)
-//
-// Color of each room box:
-//   0 students   → green  (class: vacant)
-//   1–2 students → yellow (class: partial)
-//   3 students   → red    (class: full)
-// ──────────────────────────────────────────
-function renderRooms(block, floorIndex) {
-    const container = document.getElementById('rooms-container');
-    container.innerHTML = '';  // Clear previous rooms
-
-    const ROOMS_PER_ROW = 5;
-    let roomNum  = 1;
-    let rowIndex = 0;
-
-    while (roomNum <= TOTAL_ROOMS) {
-        // Create a row div
-        const row = document.createElement('div');
-        // Even-indexed rows get the 'offset' class for zigzag
-        row.className = 'room-row' + (rowIndex % 2 === 1 ? ' offset' : '');
-
-        // How many rooms in this row (last row may have fewer than 5)
-        const count = Math.min(ROOMS_PER_ROW, TOTAL_ROOMS - roomNum + 1);
-
-        for (let i = 0; i < count; i++) {
-            const rNum     = roomNum + i;
-            const students = roomData[block][floorIndex][rNum]?.students ?? 0;
-            const vacancies = ROOM_CAPACITY - students;
-
-            // Decide color class
-            let statusClass = 'vacant';
-            if (students >= ROOM_CAPACITY) statusClass = 'full';
-            else if (students > 0)         statusClass = 'partial';
-
-            // Build room button element
-            const btn = document.createElement('div');
-            btn.className = `room-btn ${statusClass}`;
-            btn.title     = `Room ${rNum} — ${vacancies} vacant, ${students} filled`;
-
-            // Only clickable if room is not full
-            if (statusClass !== 'full') {
-                btn.onclick = () => openModal(block, floorIndex, rNum);
-            }
-
-            btn.innerHTML = `
-                <div class="room-number">Room ${rNum}</div>
-                <div class="room-icons">
-                    <div class="icon-group">
-                        <div class="icon">🟢</div>
-                        <div class="num green">${vacancies}V</div>
-                    </div>
-                    <div class="icon-group">
-                        <div class="icon">🔴</div>
-                        <div class="num red">${students}F</div>
-                    </div>
-                </div>
-            `;
-
-            row.appendChild(btn);
-        }
-
-        container.appendChild(row);
-        roomNum  += count;
-        rowIndex += 1;
+    if (page === 'home') {
+        const hp = document.getElementById('home-page');
+        hp.classList.add('active');
+        bc.innerHTML = `<span onclick="showPage('home')">🏠 Home</span>`;
+    } else if (page === 'allocation') {
+        const ap = document.getElementById('allocation-page');
+        ap.classList.add('active');
+        ap.style.display = 'block';
+        bc.innerHTML = `<span onclick="showPage('home')">🏠 Home</span> › Room Allocation`;
+    } else if (page === 'warden') {
+        const wp = document.getElementById('warden-page');
+        wp.classList.add('active');
+        wp.style.display = 'block';
+        bc.innerHTML = `<span onclick="showPage('home')">🏠 Home</span> › Add Warden`;
+        loadWardens();
     }
 }
 
 
-// ──────────────────────────────────────────
-// OPEN STUDENT FORM MODAL
-// Auto-fills Block, Floor, and Room Number
-// User fills in the rest manually
-// ──────────────────────────────────────────
-function openModal(block, floorIndex, roomNum) {
-    selectedRoomNum = roomNum;
+// ══════════════════════════════════════════
+// HAMBURGER MENU
+// ══════════════════════════════════════════
+function toggleMenu() { document.getElementById('dropdown-menu').classList.toggle('open'); }
+function closeMenu()  { document.getElementById('dropdown-menu').classList.remove('open'); }
 
-    // Reset form first so old data is cleared
+document.addEventListener('click', function(e) {
+    if (!document.getElementById('menu-toggle').contains(e.target) &&
+        !document.getElementById('dropdown-menu').contains(e.target)) closeMenu();
+});
+
+
+// ══════════════════════════════════════════
+// OPEN FLOOR VIEW
+// Hides building cards, shows zigzag wing view
+// ══════════════════════════════════════════
+function openFloor(block, floorName, floorIndex) {
+    currentBlock      = block;
+    currentFloorIndex = floorIndex;
+
+    document.getElementById('main-content').style.display = 'none';
+    document.getElementById('floor-page').classList.add('show');
+
+    document.getElementById('floor-title').textContent = `${block} Block — ${floorName}`;
+    document.getElementById('breadcrumb').innerHTML =
+        `<span onclick="showPage('home')">🏠 Home</span> › <span onclick="backToBuildings()">Room Allocation</span> › ${block} Block › ${floorName}`;
+
+    // Update wing range labels
+    const off = FLOOR_OFFSET[floorIndex];
+    document.getElementById('left-wing-range').textContent  = `(Rooms ${off+1} – ${off+LEFT_COUNT})`;
+    document.getElementById('right-wing-range').textContent = `(Rooms ${off+LEFT_COUNT+1} – ${off+TOTAL_ROOMS})`;
+
+    renderWings(block, floorIndex);
+}
+
+function backToBuildings() {
+    document.getElementById('floor-page').classList.remove('show');
+    document.getElementById('main-content').style.display = 'flex';
+    document.getElementById('breadcrumb').innerHTML =
+        `<span onclick="showPage('home')">🏠 Home</span> › Room Allocation`;
+}
+
+
+// ══════════════════════════════════════════
+// RENDER ZIGZAG ROOMS IN BOTH WINGS
+//
+// Exactly 2 rows per wing, centred on page.
+//
+// LEFT WING (15 rooms) — 2 rows:
+//   Row 0 (no shift):  [R1 ][R2 ][R3 ][R4 ][R5 ][R6 ][R7 ][R8 ]  → 8 rooms
+//   Row 1 (shifted):      [R9 ][R10][R11][R12][R13][R14][R15]     → 7 rooms
+//
+// RIGHT WING (14 rooms) — 2 rows:
+//   Row 0 (no shift):  [R16][R17][R18][R19][R20][R21][R22]        → 7 rooms
+//   Row 1 (shifted):      [R23][R24][R25][R26][R27][R28][R29]     → 7 rooms
+//
+// The shift = (room-width + gap) / 2 = (90 + 12) / 2 = 51px
+// ══════════════════════════════════════════
+function renderWings(block, floorIndex) {
+    renderOneWing(block, floorIndex, 'left-wing-grid',  1,              LEFT_COUNT,  8);
+    renderOneWing(block, floorIndex, 'right-wing-grid', LEFT_COUNT + 1, RIGHT_COUNT, 7);
+}
+
+// Build the 2-row zigzag grid for one wing
+// block        → 'D' or 'L'
+// floorIndex   → 0, 1, 2
+// gridId       → element id to render into
+// startPos     → first room's position within floor (1-based)
+// count        → total rooms in this wing (15 or 14)
+// row0Count    → how many rooms go in the FIRST row (rest go in row 1)
+function renderOneWing(block, floorIndex, gridId, startPos, count, row0Count) {
+    const grid = document.getElementById(gridId);
+    grid.innerHTML = '';
+
+    const off    = FLOOR_OFFSET[floorIndex];   // 0, 29 or 58
+    const endPos = startPos + count;           // exclusive end position
+    let   pos    = startPos;
+
+    // ── ROW 0: first `row0Count` rooms, NO shift ────────────
+    const row0 = document.createElement('div');
+    row0.className = 'zz-row';  // no 'shifted' class → starts at left
+
+    const row0End = startPos + row0Count;
+    while (pos < row0End && pos < endPos) {
+        row0.appendChild(makeRoomBox(block, floorIndex, off + pos));
+        pos++;
+    }
+    grid.appendChild(row0);
+
+    // ── ROW 1: remaining rooms, SHIFTED right ────────────────
+    if (pos < endPos) {
+        const row1 = document.createElement('div');
+        row1.className = 'zz-row shifted';  // 'shifted' → padding-left: 51px
+
+        while (pos < endPos) {
+            row1.appendChild(makeRoomBox(block, floorIndex, off + pos));
+            pos++;
+        }
+        grid.appendChild(row1);
+    }
+}
+
+// Create and return one square room box DOM element
+function makeRoomBox(block, floorIndex, absRoom) {
+    const students  = roomData[block][floorIndex][absRoom]?.students ?? 0;
+    const vacancies = ROOM_CAPACITY - students;
+
+    let cls = 'vacant';
+    if      (students >= ROOM_CAPACITY) cls = 'full';
+    else if (students > 0)             cls = 'partial';
+
+    const box = document.createElement('div');
+    box.className = `room-box ${cls}`;
+    box.title     = `Room ${absRoom} — ${vacancies} vacant, ${students} filled`;
+
+    if (cls !== 'full') {
+        box.onclick = () => openModal(block, floorIndex, absRoom);
+    }
+
+    box.innerHTML = `
+        <div class="room-num">Room<br>${absRoom}</div>
+        <div class="room-icons">
+            <div class="icon-grp">
+                <span class="ico">🟢</span>
+                <span class="cnt green">${vacancies}V</span>
+            </div>
+            <div class="icon-grp">
+                <span class="ico">🔴</span>
+                <span class="cnt red">${students}F</span>
+            </div>
+        </div>`;
+
+    return box;
+}
+
+
+// ══════════════════════════════════════════
+// STUDENT FORM MODAL
+// ══════════════════════════════════════════
+function openModal(block, floorIndex, absRoomNum) {
+    selectedRoomNum = absRoomNum;
+
     document.getElementById('student-form').reset();
 
-    // Auto-fill readonly fields AFTER reset
+    // Auto-fill room info
     document.getElementById('block').value       = block + ' Block';
     document.getElementById('floor_name').value  = FLOOR_NAMES[floorIndex];
-    document.getElementById('floor_index').value = floorIndex;   // numeric: 0, 1, or 2
-    document.getElementById('room_number').value = roomNum;
+    document.getElementById('floor_index').value = floorIndex;
+    document.getElementById('room_number').value = absRoomNum;
 
-    // Re-enable submit button (in case it was disabled before)
-    document.getElementById('submit-btn').disabled    = false;
-    document.getElementById('submit-btn').textContent = '✅ Allocate Room';
+    const btn = document.getElementById('submit-btn');
+    btn.disabled    = false;
+    btn.textContent = '✅ Allocate Room';
 
     document.getElementById('modal-overlay').classList.add('active');
 }
@@ -827,115 +1138,154 @@ function closeModal() {
     document.getElementById('modal-overlay').classList.remove('active');
 }
 
-// Close modal if user clicks outside the white box
 document.getElementById('modal-overlay').addEventListener('click', function(e) {
     if (e.target === this) closeModal();
 });
 
 
-// ──────────────────────────────────────────
-// SUBMIT STUDENT FORM
-// 1. Collects all form values
-// 2. Sends POST request to Flask /api/allocate_room
-// 3. On success: updates UI without page reload
-// 4. On failure: shows error message from backend
-// ──────────────────────────────────────────
-async function submitForm(e) {
-    e.preventDefault();  // Prevent default form submit (page reload)
+// ══════════════════════════════════════════
+// SUBMIT STUDENT FORM → Flask backend
+// student_id field removed from form.
+// Roll number is used as the unique identifier.
+// ══════════════════════════════════════════
+async function submitStudentForm(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
 
-    const submitBtn = document.getElementById('submit-btn');
+    const rollNo = document.getElementById('roll_number').value.trim();
 
-    // Build payload object from form fields
     const payload = {
-        student_id:  document.getElementById('student_id').value.trim(),
-        name:        document.getElementById('student_name').value.trim(),
-        roll_number: document.getElementById('roll_number').value.trim(),
-        dept:        document.getElementById('dept').value,
-        year:        document.getElementById('year').value,
-        phone:       document.getElementById('phone').value.trim(),
-        block:       currentBlock,                            // e.g. "D"
-        floor:       document.getElementById('floor_index').value,  // "0","1","2"
-        room_number: selectedRoomNum                          // e.g. 5
+        student_id:      rollNo,   // roll_number used as student_id (no separate field)
+        name:            document.getElementById('student_name').value.trim(),
+        roll_number:     rollNo,
+        dept:            document.getElementById('dept').value,
+        year:            document.getElementById('year').value,
+        phone:           document.getElementById('phone').value.trim(),
+        parent_id:       document.getElementById('parent_id').value.trim(),
+        parent_name:     document.getElementById('parent_name').value.trim(),
+        parent_phone:    document.getElementById('parent_phone').value.trim(),
+        parent_relation: document.getElementById('parent_relation').value,
+        block:           currentBlock,
+        floor:           document.getElementById('floor_index').value,
+        room_number:     selectedRoomNum
     };
 
-    // Basic client-side validation before sending
     if (!payload.dept || !payload.year) {
         showToast('❌ Please select Department and Year', true);
         return;
     }
 
-    // Disable button and show loading state
-    submitBtn.disabled    = true;
-    submitBtn.textContent = '⏳ Allocating...';
+    btn.disabled    = true;
+    btn.textContent = '⏳ Allocating...';
 
     try {
-        // ── SEND POST REQUEST TO FLASK BACKEND ──
-        const response = await fetch(BACKEND_URL + '/api/allocate_room', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'  // Tell Flask we're sending JSON
-            },
-            body: JSON.stringify(payload)  // Convert JS object to JSON string
+        const res    = await fetch(BACKEND_URL + '/api/allocate_room', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload)
         });
-
-        // Parse the JSON response from Flask
-        const result = await response.json();
+        const result = await res.json();
 
         if (result.success) {
-            // ✅ SUCCESS: Update local room data immediately
             roomData[currentBlock][currentFloorIndex][selectedRoomNum].students++;
-
-            closeModal();                                    // Close popup
-            renderRooms(currentBlock, currentFloorIndex);    // Redraw rooms
-            updateAllBadges();                               // Update floor badges
-
+            closeModal();
+            renderWings(currentBlock, currentFloorIndex);
+            updateAllBadges();
             showToast('✅ ' + result.message);
-
         } else {
-            // ❌ FAILURE: Backend returned an error (e.g. room full, duplicate ID)
             showToast('❌ ' + result.message, true);
-
-            // Re-enable button
-            submitBtn.disabled    = false;
-            submitBtn.textContent = '✅ Allocate Room';
+            btn.disabled    = false;
+            btn.textContent = '✅ Allocate Room';
         }
-
-    } catch (networkError) {
-        // ❌ NETWORK ERROR: Flask is not running or unreachable
-        // Fall back to demo mode — save locally only
-        console.warn('Backend not reachable. Saving locally (demo mode).');
-
+    } catch {
+        // Demo mode — no backend running
         roomData[currentBlock][currentFloorIndex][selectedRoomNum].students++;
         closeModal();
-        renderRooms(currentBlock, currentFloorIndex);
+        renderWings(currentBlock, currentFloorIndex);
         updateAllBadges();
-        showToast('✅ Allocated! (Demo mode — start Flask to save to database)');
+        showToast('✅ Allocated! (Demo mode — start Flask to save to DB)');
     }
 }
 
 
-// ──────────────────────────────────────────
-// SHOW TOAST NOTIFICATION
-// message  = text to show
-// isError  = true → red, false → green
-// auto-hides after 3.5 seconds
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════
+// WARDEN FUNCTIONS
+// ══════════════════════════════════════════
+async function loadWardens() {
+    const listDiv = document.getElementById('warden-list');
+    listDiv.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:13px;">Loading...</p>';
+    try {
+        const res  = await fetch(BACKEND_URL + '/api/wardens');
+        const data = await res.json();
+        if (!data.length) {
+            listDiv.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:13px;">No wardens added yet.</p>';
+            return;
+        }
+        listDiv.innerHTML = data.map(w => `
+            <div class="warden-card">
+                <div class="warden-card-left">
+                    <h4>${w.name}</h4>
+                    <p>${w.email} &bull; ${w.phone}</p>
+                </div>
+                <div class="warden-block-badge">${w.block} Block</div>
+            </div>
+        `).join('');
+    } catch {
+        listDiv.innerHTML = '<p style="color:#f87171;font-size:13px;">⚠️ Could not load wardens (backend offline).</p>';
+    }
+}
+
+async function submitWardenForm(e) {
+    e.preventDefault();
+    const btn = document.getElementById('warden-submit-btn');
+    const payload = {
+        name:  document.getElementById('w-name').value.trim(),
+        email: document.getElementById('w-email').value.trim(),
+        phone: document.getElementById('w-phone').value.trim(),
+        block: document.getElementById('w-block').value
+    };
+    btn.disabled    = true;
+    btn.textContent = '⏳ Adding...';
+    try {
+        const res    = await fetch(BACKEND_URL + '/api/add_warden', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result.success) {
+            document.getElementById('warden-form').reset();
+            showToast('✅ Warden added successfully!');
+            loadWardens();
+        } else {
+            showToast('❌ ' + result.message, true);
+        }
+    } catch {
+        showToast('❌ Backend not running. Start Flask first.', true);
+    }
+    btn.disabled    = false;
+    btn.textContent = '➕ Add Warden';
+}
+
+
+// ══════════════════════════════════════════
+// TOAST NOTIFICATION
+// ══════════════════════════════════════════
 function showToast(message, isError = false) {
     const toast = document.getElementById('toast');
-    toast.textContent  = message;
+    toast.textContent      = message;
     toast.style.background = isError ? '#f87171' : '#4ade80';
-    toast.style.color      = isError ? '#fff' : '#1a1a2e';
+    toast.style.color      = isError ? '#fff'    : '#1a1a2e';
     toast.style.display    = 'block';
     setTimeout(() => { toast.style.display = 'none'; }, 3500);
 }
 
 
-// ──────────────────────────────────────────
-// APP START
-// Runs when page loads
-// ──────────────────────────────────────────
-initRoomData();          // Build empty room structure
-checkBackendConnection(); // Ping Flask, load real data if online
+// ══════════════════════════════════════════
+// START
+// ══════════════════════════════════════════
+initRoomData();
+checkBackendConnection();
 
 </script>
 </body>

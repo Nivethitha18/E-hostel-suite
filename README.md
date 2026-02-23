@@ -1,238 +1,244 @@
-# 🏢 Hostel Management System — Complete Setup Guide
+# 🏢 Hostel Management System
 
-## 📁 Project Structure
+A full-stack web application for managing hostel room allocations, students, wardens, and parent records.
+
+---
+
+## 📁 Project Folder Structure
+
 ```
 hostel_management/
 │
-├── index.html       ← Frontend (all HTML + CSS + JavaScript in one file)
-├── app.py           ← Python backend (Flask web server + MySQL connection)
-├── database.sql     ← MySQL database setup (run this once)
-├── requirements.txt ← Python packages to install
-└── README.md        ← This guide
+├── index.html          ← Frontend  (HTML + CSS + JavaScript — all in one file)
+├── app.py              ← Backend   (Python Flask web server + MySQL API)
+├── database.sql        ← Database  (MySQL schema — run this once)
+├── requirements.txt    ← Python packages list
+└── README.md           ← This guide
 ```
 
 ---
 
-## 🛠️ STEP 1 — Install Required Software
+## 🛠️ SOFTWARE TO INSTALL FIRST
 
-Before starting, make sure these are installed on your computer:
+### 1. Python 3.x
+- Download: https://www.python.org/downloads/
+- ⚠️ During install → tick **"Add Python to PATH"** checkbox
 
-### A. Python (version 3.8 or above)
-- Download from: https://www.python.org/downloads/
-- During installation, **tick the box** that says "Add Python to PATH"
+### 2. MySQL + MySQL Workbench
+- Download: https://dev.mysql.com/downloads/installer/
+- Choose **Developer Default** setup
+- Set a root password (e.g. `root123`) — remember it!
 
-### B. MySQL
-- Download MySQL Community Server from: https://dev.mysql.com/downloads/mysql/
-- Also install **MySQL Workbench** (a visual tool to manage your database)
-- Remember the **root password** you set during installation
-
-### C. VS Code (Code Editor)
-- Download from: https://code.visualstudio.com/
-- Install the **Python extension** from VS Code marketplace
+### 3. VS Code
+- Download: https://code.visualstudio.com/
 
 ---
 
-## 🗄️ STEP 2 — Set Up the MySQL Database
+## 🗄️ STEP 1 — Set Up the Database
 
-### Open MySQL Workbench and run these steps:
+1. Open **MySQL Workbench**
+2. Connect using your root password
+3. Click **File → Open SQL Script** → select `database.sql`
+4. Press **Ctrl + Shift + Enter** to run it
+5. You should see ✅ green ticks — `hostel_db` is now created with 4 tables
 
-1. Open **MySQL Workbench** → connect using your root password
-2. Click the **SQL editor** (the + tab icon)
-3. Open the file `database.sql` from this project folder
-4. Click the **⚡ (lightning bolt)** button to run all the SQL commands
-5. You should see `hostel_db` appear in the left panel under "Schemas"
+**Tables created:**
+| Table | Purpose |
+|---|---|
+| `wardens` | Stores warden details for D and L blocks |
+| `parents` | Stores parent/guardian contact information |
+| `students` | Main table — room allocations + FK links to wardens & parents |
+| `complaints` | Student complaints linked to students table |
 
-### What the database creates:
-- `wardens` table — stores hostel warden details
-- `parents` table — stores parent/guardian contact info  
-- `students` table — stores student + room allocation data (linked to wardens and parents via Foreign Keys)
-- `complaints` table — stores student complaints (linked to students)
+---
+
+## ⚙️ STEP 2 — Configure Your Password
+
+Open `app.py` in VS Code and find this section at the top:
+
+```python
+DB_CONFIG = {
+    'host':     '127.0.0.1',
+    'port':     3306,
+    'user':     'root',
+    'password': 'Mysql@123',   ← CHANGE THIS to your MySQL password
+    'database': 'hostel_db'
+}
+```
+
+Press **Ctrl + S** to save.
 
 ---
 
 ## 📦 STEP 3 — Install Python Packages
 
-### Open VS Code, then open a Terminal inside VS Code:
-`View → Terminal` (or press Ctrl + `)
+Open VS Code → open Terminal (Ctrl + `) → type:
 
 ```bash
-# Navigate to your project folder (change path as needed)
-cd path/to/hostel_management
-
-# Install all required Python packages at once
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 This installs:
-- **flask** — the web server framework
+- **flask** — web server framework
 - **flask-cors** — allows HTML to talk to Flask
 - **mysql-connector-python** — connects Python to MySQL
 
 ---
 
-## ⚙️ STEP 4 — Configure Your Database Password
+## ▶️ STEP 4 — Run the Project
 
-Open `app.py` in VS Code and find this section near the top:
+In the VS Code terminal:
 
-```python
-DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': 'your_password',   ← CHANGE THIS LINE
-    'database': 'hostel_db'
-}
-```
-
-Replace `'your_password'` with your actual MySQL root password. Save the file.
-
----
-
-## 🚀 STEP 5 — Run the Project
-
-### In the VS Code Terminal:
 ```bash
 python app.py
 ```
 
-You should see:
+You will see:
+
 ```
-==================================================
- Hostel Management System - Backend Running
- Open http://localhost:5000 in your browser
-==================================================
- * Running on http://127.0.0.1:5000
+=======================================================
+   HOSTEL MANAGEMENT SYSTEM — Backend Running
+   Open  →  http://localhost:5000
+=======================================================
+  Routes available:
+  GET  /api/wardens       — list all wardens
+  POST /api/add_warden    — add new warden
+  PUT  /api/update_warden — update warden
+  DEL  /api/delete_warden — delete warden
+  GET  /api/room_stats    — room occupancy
+  POST /api/allocate_room — register student
+  GET  /api/students      — all students
+=======================================================
 ```
 
-### Open your browser and go to:
+Open your browser and go to:
 ```
 http://localhost:5000
 ```
-
-The website will load and show two big rectangles for D Block and L Block.
 
 ---
 
 ## 🖥️ HOW TO USE THE WEBSITE
 
-### Main Page:
-- You see two big building cards: **D Block** and **L Block**
-- Each card has 3 floor buttons: Ground Floor, First Floor, Second Floor
-- Each button shows **Vacant** and **Filled** room counts
+### Home Page
+- Big "Welcome to Hostel Management" screen appears
+- Two quick-action cards: **Room Allocation** and **Add Warden**
+- Top-right corner has a ☰ menu button with same options
 
-### Floor View:
-- Click any floor button → the page shows **29 rooms in a zigzag pattern**
-- 🟢 Green room = vacant beds available (click to allocate)
-- 🟡 Yellow room = partially filled (click to allocate more)
-- 🔴 Red room = completely full (no click)
-- Each room shows: number of vacant spots (V) and filled spots (F)
+### Room Allocation
+- Shows **D Block** and **L Block** as two big cards
+- Each block has 3 floor buttons (Ground / First / Second Floor)
+- Each floor button shows **Vacant** and **Filled** room counts
+- Click any floor → see **Left Wing** and **Right Wing** rectangles
+- Rooms are numbered sequentially:
+  - Ground Floor: Rooms 1–29 (Left: 1–15, Right: 16–29)
+  - First Floor: Rooms 30–58 (Left: 30–44, Right: 45–58)
+  - Second Floor: Rooms 59–87 (Left: 59–73, Right: 74–87)
+- 🟢 Green room = vacant (click to allocate)
+- 🟡 Yellow room = partially filled (click to add more)
+- 🔴 Red room = full (not clickable)
 
-### Room Allocation:
-- Click a green or yellow room → a form pops up
-- Fill in: Student ID, Roll Number, Name, Department, Year, Phone
-- Click **"Allocate Room"** → data is saved to MySQL database
-- Room status updates automatically on screen
+### Student Form (when clicking a room)
+- **Student Details**: ID, Roll Number, Name, Department, Year, Phone
+- **Parent Details**: Parent ID, Parent Name, Parent Phone, Relation
+- **Room Details**: Auto-filled (Block, Floor, Room Number)
+
+### Add Warden Page
+- Fill: Name, Email, Phone, Block (D or L)
+- Existing wardens list shown below the form
+- Validates for duplicate email before saving
 
 ---
 
-## 🔗 HOW THE PARTS CONNECT (Architecture)
+## 🔗 HOW FRONTEND ↔ FLASK ↔ MYSQL CONNECTS
 
 ```
 Browser (index.html)
-       │
-       │ fetch('/api/room_stats')    ← GET request to load room data
-       │ fetch('/api/allocate_room') ← POST request to save student
-       ↓
-Flask Server (app.py running on port 5000)
-       │
-       │ SELECT / INSERT SQL queries
-       ↓
+    |
+    |── GET  /api/room_stats ──────→ Flask reads students table
+    |                                returns room occupancy JSON
+    |
+    |── POST /api/allocate_room ──→ Flask validates data
+    |                                inserts parent (if new)
+    |                                inserts student with parent FK
+    |                                returns success/error
+    |
+    |── GET  /api/wardens ─────────→ Flask reads wardens table
+    |                                returns warden list JSON
+    |
+    |── POST /api/add_warden ──────→ Flask validates
+    |                                checks duplicate email
+    |                                inserts into wardens table
+    |                                returns success/error
+    ↓
 MySQL Database (hostel_db)
-       ├── wardens   ← warden_id is FK in students table
-       ├── parents   ← parent_id is FK in students table
-       ├── students  ← main table with room allocation data
-       └── complaints ← student_id is FK from students table
-```
-
-**Foreign Key explained simply:**
-- A Foreign Key is like a reference. In `students` table, `warden_id` is a FK that points to the `wardens` table. This means every student must belong to a valid warden. The database will reject any student entry with a warden_id that doesn't exist in the wardens table.
-
----
-
-## 🔧 LINE-BY-LINE CODE EXPLANATION
-
-### index.html — Key JavaScript Functions:
-
-```javascript
-initRoomData()
-// Creates an empty data structure in memory for all 6 floors
-// roomData['D'][0][5] = { students: 2 }
-//           ↑  ↑  ↑
-//         block floor room
-
-loadRoomStats()
-// Fetches /api/room_stats from Flask
-// Gets how many students are in each room from MySQL
-// Updates the Vacant/Filled badges on main page
-
-openFloor('D', 'Ground Floor', 0)
-// Called when you click a floor button
-// Hides the main building view
-// Calls renderRooms() to draw 29 room boxes
-
-renderRooms(block, floorIndex)
-// Draws 29 room buttons in a ZIGZAG pattern
-// Zigzag = rows of 5, alternating with a left offset
-// Row 1: no offset, Row 2: shifted right, Row 3: no offset...
-// Each room shows green/yellow/red based on occupancy
-
-openModal(block, floorIndex, roomNum)
-// Opens the student registration popup
-// Pre-fills the Block and Room Number fields
-
-submitForm(event)
-// Collects form data
-// Sends POST request to /api/allocate_room in Flask
-// On success: updates room color + shows toast notification
-```
-
-### app.py — Key Routes:
-
-```python
-@app.route('/api/room_stats')
-# Returns JSON list of rooms with student counts
-# Frontend uses this to show vacancy numbers
-
-@app.route('/api/allocate_room', methods=['POST'])
-# 1. Checks if room already has 3 students (full)
-# 2. Checks if student_id already exists
-# 3. If both checks pass, INSERT into MySQL
-# 4. Returns success/failure JSON to frontend
+    ├── wardens    ← warden_id is FK in students table
+    ├── parents    ← parent_id is FK in students table
+    ├── students   ← main room allocation data
+    └── complaints ← student_id is FK from students
 ```
 
 ---
 
-## ➕ FEATURES YOU CAN ADD NEXT
+## 🔁 EVERY TIME YOU WANT TO USE THE PROJECT
 
-1. **Warden Login Panel** — separate admin page to view all students, manage complaints
-2. **Parent Portal** — parents can view their child's room info and submit queries
-3. **Complaint System** — students submit maintenance complaints, wardens resolve them
-4. **Checkout / Vacate Room** — remove a student from a room when they leave
-5. **Student Dashboard** — each student can login and see their room, messmates, complaints
-6. **Mess Fee Tracking** — track monthly mess fees and payment status per student
-7. **Visitor Log** — record when outsiders visit a student (security feature)
-8. **Export to PDF/Excel** — download list of students per floor for records
-9. **Email Notifications** — send room allocation confirmation to student/parent email
-10. **Search & Filter** — search student by name, roll number, or room number
+You only need 2 steps after first setup:
+
+1. Open VS Code terminal → run:
+```bash
+python app.py
+```
+
+2. Open browser → go to:
+```
+http://localhost:5000
+```
 
 ---
 
-## ❓ TROUBLESHOOTING
+## ❌ TROUBLESHOOTING
 
-| Problem | Solution |
-|---|---|
-| `ModuleNotFoundError: flask` | Run `pip install -r requirements.txt` again |
-| `Access denied for user 'root'` | Check your MySQL password in `DB_CONFIG` in app.py |
-| `Unknown database 'hostel_db'` | Run `database.sql` in MySQL Workbench first |
-| Website shows `--` for room counts | Backend not running; start with `python app.py` |
-| Port 5000 already in use | Change `port=5000` to `port=5001` in app.py, then visit `localhost:5001` |
-| Form submitted but data not saved | Check terminal for error messages in app.py |
+| Error | Cause | Fix |
+|---|---|---|
+| `pip not recognized` | Python not in PATH | Use `python -m pip install -r requirements.txt` |
+| `Access denied for user 'root'` | Wrong password in app.py | Update `DB_CONFIG` password in app.py |
+| `Unknown database 'hostel_db'` | database.sql not run | Run database.sql in MySQL Workbench |
+| `Can't connect to MySQL server` | MySQL not running | Open Services → Start MySQL80 |
+| `ModuleNotFoundError: flask` | Packages not installed | Run `python -m pip install -r requirements.txt` |
+| Website shows `--` for room counts | Flask not running | Run `python app.py` first |
+| Red dot in navbar | Backend offline | Start Flask with `python app.py` |
+| `Email already registered` | Duplicate warden email | Use a different email for the warden |
+| Port 5000 already in use | Another app using port | Change `port=5000` to `port=5001` in app.py and visit `localhost:5001` |
+
+---
+
+## 🔮 FEATURES TO ADD NEXT
+
+1. **Student Login** — students log in to see their own room details
+2. **Warden Dashboard** — wardens can view all students in their block
+3. **Complaints System** — students submit maintenance complaints
+4. **Checkout / Vacate** — remove student when they leave
+5. **Mess Fee Tracking** — record monthly fee payments
+6. **PDF Reports** — download floor-wise student lists
+7. **Email Notifications** — send room allocation emails
+8. **Search & Filter** — find students by name, room, or department
+9. **Parent Portal** — parents view their child's room info
+10. **Visitor Log** — record hostel visitors for security
+
+---
+
+## 📊 DATABASE FOREIGN KEY RELATIONSHIPS
+
+```
+wardens (warden_id PK)
+    ↑ FK (warden_id)
+students (student_id PK) ──── FK (parent_id) ──→ parents (parent_id PK)
+    ↑ FK (student_id)
+complaints (complaint_id PK)
+```
+
+- Every **student** can be linked to one **warden** (optional)
+- Every **student** can be linked to one **parent** (required when allocating)
+- Every **complaint** must belong to an existing **student**
+- Deleting a warden sets `warden_id = NULL` in students (safe delete)
+- Deleting a student also deletes their complaints (cascade delete)
