@@ -1,89 +1,82 @@
 -- ============================================================
---  HOSTEL MANAGEMENT SYSTEM - MySQL Database
---  File: database.sql
---  Run this ONCE in MySQL Workbench
+--  HOSTEL MANAGEMENT SYSTEM — Full Schema v2
+--  Run this ONCE to set up the complete database
 -- ============================================================
 
--- Drop and recreate database cleanly
 DROP DATABASE IF EXISTS hostel_db;
 CREATE DATABASE hostel_db;
 USE hostel_db;
 
 -- ─────────────────────────────────────────────
--- TABLE 1: WARDENS
--- Stores warden details for each block
--- Must be created before students (FK reference)
+-- TABLE 1: WATCHMEN
+-- ─────────────────────────────────────────────
+CREATE TABLE watchmen (
+    watchman_id  INT AUTO_INCREMENT PRIMARY KEY,
+    name         VARCHAR(100) NOT NULL,
+    email        VARCHAR(100) UNIQUE,
+    phone        VARCHAR(15)  UNIQUE NOT NULL,
+    shift        ENUM('Morning','Evening','Night') DEFAULT 'Morning',
+    active       TINYINT(1) DEFAULT 1,
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ─────────────────────────────────────────────
+-- TABLE 2: WARDENS (no block column — year only)
 -- ─────────────────────────────────────────────
 CREATE TABLE wardens (
     warden_id  INT AUTO_INCREMENT PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
     email      VARCHAR(100) UNIQUE NOT NULL,
     phone      VARCHAR(15),
-    block      ENUM('D','L') NOT NULL,
+    year       ENUM('1','2','3','4') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Default wardens for D and L block
-INSERT INTO wardens (name, email, phone, block) VALUES
-    ('Mr. Rajesh Kumar', 'rajesh@hostel.edu', '9876543210', 'D'),
-    ('Mrs. Priya Devi',  'priya@hostel.edu',  '9876543211', 'L');
-
+-- Default wardens
+INSERT INTO wardens (name, email, phone, year) VALUES
+    ('Mr. Rajesh Kumar', 'rajesh@hostel.edu', '9876543210', '1'),
+    ('Mrs. Priya Devi',  'priya@hostel.edu',  '9876543211', '2');
 
 -- ─────────────────────────────────────────────
--- TABLE 2: PARENTS
--- parent_id is VARCHAR so it can accept values
--- like "PAR001" entered from the form
--- Must be created before students (FK reference)
+-- TABLE 3: PARENTS
 -- ─────────────────────────────────────────────
 CREATE TABLE parents (
-    parent_id  VARCHAR(20) PRIMARY KEY,       -- e.g. PAR001
+    parent_id  INT AUTO_INCREMENT PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
-    phone      VARCHAR(15)  NOT NULL,
+    phone      VARCHAR(15)  UNIQUE NOT NULL,
     email      VARCHAR(100),
-    relation   VARCHAR(50) DEFAULT 'Parent',  -- Father / Mother / Guardian
+    relation   VARCHAR(50) DEFAULT 'Parent',
     address    TEXT,
+    otp        VARCHAR(10)  DEFAULT NULL,
+    otp_expiry DATETIME     DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
 -- ─────────────────────────────────────────────
--- TABLE 3: STUDENTS
--- Links to wardens (warden_id FK)
--- Links to parents  (parent_id FK)
+-- TABLE 4: STUDENTS
 -- ─────────────────────────────────────────────
 CREATE TABLE students (
     id          INT AUTO_INCREMENT PRIMARY KEY,
-    student_id  VARCHAR(20)  UNIQUE NOT NULL,   -- e.g. STU001
+    student_id  VARCHAR(20)  UNIQUE NOT NULL,
     name        VARCHAR(100) NOT NULL,
-    roll_number VARCHAR(20)  UNIQUE NOT NULL,   -- e.g. 22CS001
+    roll_number VARCHAR(20)  UNIQUE NOT NULL,
     dept        VARCHAR(100) NOT NULL,
     year        VARCHAR(20)  NOT NULL,
     phone       VARCHAR(15),
     block       ENUM('D','L') NOT NULL,
-    floor       TINYINT NOT NULL,               -- 0=Ground 1=First 2=Second
-    room_number TINYINT NOT NULL,               -- 1 to 29
+    floor       TINYINT NOT NULL,
+    room_number TINYINT NOT NULL,
     warden_id   INT          DEFAULT NULL,
-    parent_id   VARCHAR(20)  DEFAULT NULL,      -- matches parents.parent_id type
+    parent_id   INT          DEFAULT NULL,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    -- FK: student → warden
-    CONSTRAINT fk_warden
-        FOREIGN KEY (warden_id) REFERENCES wardens(warden_id)
-        ON DELETE SET NULL,
-
-    -- FK: student → parent
-    CONSTRAINT fk_parent
-        FOREIGN KEY (parent_id) REFERENCES parents(parent_id)
-        ON DELETE SET NULL,
-
-    -- Index for fast room queries
+    CONSTRAINT fk_warden  FOREIGN KEY (warden_id) REFERENCES wardens(warden_id) ON DELETE SET NULL,
+    CONSTRAINT fk_parent  FOREIGN KEY (parent_id) REFERENCES parents(parent_id)  ON DELETE SET NULL,
     INDEX idx_room (block, floor, room_number)
 );
 
-
 -- ─────────────────────────────────────────────
--- TABLE 4: COMPLAINTS
--- Linked to students via student_id FK
+-- TABLE 5: COMPLAINTS
 -- ─────────────────────────────────────────────
 CREATE TABLE complaints (
     complaint_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -92,17 +85,51 @@ CREATE TABLE complaints (
     description  TEXT,
     status       ENUM('Pending','In Progress','Resolved') DEFAULT 'Pending',
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_complaint_student
-        FOREIGN KEY (student_id) REFERENCES students(student_id)
-        ON DELETE CASCADE
+    CONSTRAINT fk_complaint_student FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
 );
 
+-- ─────────────────────────────────────────────
+-- TABLE 6: OUTPASSES
+-- ─────────────────────────────────────────────
+CREATE TABLE outpasses (
+    outpass_id       INT AUTO_INCREMENT PRIMARY KEY,
+    student_id       VARCHAR(20)  NOT NULL,
+    student_name     VARCHAR(100) NOT NULL,
+    roll_number      VARCHAR(20)  NOT NULL,
+    dept             VARCHAR(100) NOT NULL,
+    year             VARCHAR(20)  NOT NULL,
+    phone            VARCHAR(15),
+    block            ENUM('D','L') NOT NULL,
+    destination      VARCHAR(255) NOT NULL,
+    reason           TEXT         NOT NULL,
+    leave_datetime   DATETIME     NOT NULL,
+    return_datetime  DATETIME     NOT NULL,
+    status           ENUM('PENDING','PARENT_APPROVED','PARENT_REJECTED','WARDEN_APPROVED','WARDEN_REJECTED') DEFAULT 'PENDING',
+    parent_id        INT          DEFAULT NULL,
+    parent_remarks   TEXT         DEFAULT NULL,
+    parent_action_at DATETIME     DEFAULT NULL,
+    warden_id        INT          DEFAULT NULL,
+    warden_remarks   TEXT         DEFAULT NULL,
+    warden_action_at DATETIME     DEFAULT NULL,
+    exit_time        DATETIME     DEFAULT NULL,
+    entry_time       DATETIME     DEFAULT NULL,
+    watchman_note    TEXT         DEFAULT NULL,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_op_student FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    CONSTRAINT fk_op_parent  FOREIGN KEY (parent_id)  REFERENCES parents(parent_id)   ON DELETE SET NULL,
+    CONSTRAINT fk_op_warden  FOREIGN KEY (warden_id)  REFERENCES wardens(warden_id)   ON DELETE SET NULL,
+    INDEX idx_student (student_id),
+    INDEX idx_status  (status),
+    INDEX idx_parent  (parent_id),
+    INDEX idx_warden  (warden_id)
+);
 
 -- ─────────────────────────────────────────────
--- VERIFY  (uncomment and run to check)
+-- DEFAULT ADMIN credentials stored in app.py
+-- Admin: username=admin  password=admin123
 -- ─────────────────────────────────────────────
+
+-- Verify
 -- SHOW TABLES;
--- SELECT * FROM wardens;
--- DESCRIBE students;
--- DESCRIBE parents;
