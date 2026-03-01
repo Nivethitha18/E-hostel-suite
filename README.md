@@ -1,4 +1,5 @@
 # 🏢 Hostel Management System
+For admin login use uname="admin" pass="admin123"
 
 A full-stack web application for managing hostel room allocations, students, wardens, and parent records.
 
