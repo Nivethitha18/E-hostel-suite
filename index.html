@@ -12,203 +12,85 @@
   --dark:#0d0d14;--dark2:#12121c;--dark3:#1a1a28;
   --card:#1e1e2e;--card2:#252538;
   --text:#f0ead6;--muted:#7a7a9a;--border:rgba(212,168,67,0.2);
-  --green:#3ddc84;--red:#ff5f6d;--blue:#60a5fa;--amber:#fbbf24;
+  --green:#3ddc84;--red:#ff5f6d;--blue:#60a5fa;--amber:#fbbf24;--purple:#a78bfa;
 }
 html,body{min-height:100%;height:100%;font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden}
-
-/* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
-/* ════════════════ WELCOME / LOGIN SCREEN ════════════════ */
-#login-screen{
-  position:fixed;inset:0;z-index:9999;
-  background:var(--dark);
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;
-  padding:20px;
-  transition:opacity .5s,transform .5s;
-}
+/* ════ LOGIN SCREEN ════ */
+#login-screen{position:fixed;inset:0;z-index:9999;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:20px;transition:opacity .5s,transform .5s}
 #login-screen.hide{opacity:0;transform:scale(1.04);pointer-events:none}
-
-.login-bg{
-  position:absolute;inset:0;overflow:hidden;
-}
-.login-bg::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212,168,67,0.12) 0%, transparent 70%),
-             radial-gradient(ellipse 60% 80% at 80% 100%, rgba(96,165,250,0.06) 0%, transparent 60%);
-}
-.grid-lines{
-  position:absolute;inset:0;
-  background-image:linear-gradient(rgba(212,168,67,0.04) 1px,transparent 1px),
-                   linear-gradient(90deg,rgba(212,168,67,0.04) 1px,transparent 1px);
-  background-size:60px 60px;
-}
-
-.login-wrap{
-  position:relative;z-index:2;width:100%;max-width:440px;margin:auto 0;padding:20px 0;
-  animation:fadeUp .7s ease both;
-}
+.login-bg{position:absolute;inset:0;overflow:hidden}
+.login-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(212,168,67,0.12) 0%,transparent 70%),radial-gradient(ellipse 60% 80% at 80% 100%,rgba(96,165,250,0.06) 0%,transparent 60%)}
+.grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(212,168,67,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(212,168,67,0.04) 1px,transparent 1px);background-size:60px 60px}
+.login-wrap{position:relative;z-index:2;width:100%;max-width:440px;margin:auto 0;padding:20px 0;animation:fadeUp .7s ease both}
 @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
-
 .login-logo{text-align:center;margin-bottom:36px}
 .login-logo .icon{font-size:56px;display:block;margin-bottom:12px;animation:float 3s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.login-logo h1{
-  font-family:'Playfair Display',serif;font-size:28px;
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  letter-spacing:1px;
-}
+.login-logo h1{font-family:'Playfair Display',serif;font-size:28px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px}
 .login-logo p{color:var(--muted);font-size:13px;margin-top:6px;letter-spacing:.5px}
-
-.login-card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:20px;padding:32px;
-  box-shadow:0 32px 80px rgba(0,0,0,0.5);
-  position:relative;overflow:hidden;
-}
-.login-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--gold3),var(--gold),var(--gold2),var(--gold));
-}
-
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;box-shadow:0 32px 80px rgba(0,0,0,0.5);position:relative;overflow:hidden}
+.login-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold3),var(--gold),var(--gold2),var(--gold))}
 .role-label{font-size:12px;font-weight:600;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
-
 .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
-.role-btn{
-  background:var(--card2);border:1.5px solid rgba(255,255,255,0.08);
-  border-radius:12px;padding:16px 10px;cursor:pointer;
-  transition:all .22s;text-align:center;
-}
+.role-btn{background:var(--card2);border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 10px;cursor:pointer;transition:all .22s;text-align:center}
 .role-btn:hover,.role-btn.active{border-color:var(--gold);background:rgba(212,168,67,0.1)}
 .role-btn .rb-icon{font-size:26px;margin-bottom:6px;display:block}
 .role-btn .rb-name{font-size:12px;font-weight:600;color:var(--text)}
-
 .form-sep{height:1px;background:var(--border);margin:20px 0}
-
-.inp{
-  width:100%;padding:12px 16px;
-  background:rgba(255,255,255,0.05);
-  border:1.5px solid rgba(255,255,255,0.1);
-  border-radius:10px;color:var(--text);
-  font-size:14px;font-family:inherit;outline:none;
-  transition:border-color .2s;
-}
+.inp{width:100%;padding:12px 16px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
 .inp:focus{border-color:var(--gold);background:rgba(212,168,67,0.05)}
 .inp::placeholder{color:var(--muted)}
 .inp-group{margin-bottom:14px}
 .inp-label{font-size:12px;color:var(--muted);margin-bottom:6px;display:block;font-weight:500}
 select.inp option{background:var(--dark2)}
-
-.otp-row{display:flex;gap:10px}
-.otp-row .inp{flex:1;letter-spacing:8px;font-size:18px;font-weight:700;text-align:center}
-
-.btn-gold{
-  width:100%;padding:13px;border:none;border-radius:10px;
-  background:linear-gradient(135deg,var(--gold),#c08a20);
-  color:#1a1000;font-size:14px;font-weight:700;
-  cursor:pointer;transition:all .2s;letter-spacing:.5px;
-  font-family:inherit;
-}
+.btn-gold{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--gold),#c08a20);color:#1a1000;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.5px;font-family:inherit}
 .btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(212,168,67,0.35)}
 .btn-gold:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
-.btn-ghost{
-  background:transparent;border:1.5px solid var(--border);
-  color:var(--muted);border-radius:10px;padding:11px;
-  cursor:pointer;font-size:13px;font-family:inherit;
-  transition:all .2s;width:100%;
-}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--muted);border-radius:10px;padding:11px;cursor:pointer;font-size:13px;font-family:inherit;transition:all .2s;width:100%}
 .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
-
-.conn-pill{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:5px 12px;border-radius:20px;
-  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
-  font-size:11px;color:var(--muted);margin-bottom:20px;
-}
+.conn-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:11px;color:var(--muted);margin-bottom:20px}
 .conn-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);animation:pulse 1.5s infinite}
 .conn-dot.on{background:var(--green);animation:none}
 .conn-dot.off{background:var(--red);animation:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.otp-hint{background:rgba(212,168,67,0.08);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--gold2);margin-bottom:16px;display:none}
+.otp-hint.show{display:flex;align-items:center;gap:10px}
 
-/* ════════════════ MAIN APP ════════════════ */
+/* ════ MAIN APP ════ */
 #app{display:none;min-height:100vh;flex-direction:column}
 #app.show{display:flex}
-
-/* ── TOP BAR ── */
-.topbar{
-  height:58px;flex-shrink:0;
-  background:var(--dark2);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;
-  padding:0 24px;gap:16px;position:sticky;top:0;z-index:500;
-}
+.topbar{height:58px;flex-shrink:0;background:var(--dark2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:500}
 .topbar-logo{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);cursor:pointer;white-space:nowrap}
 .topbar-logo:hover{opacity:.8}
 .topbar-spacer{flex:1}
-.user-badge{
-  display:flex;align-items:center;gap:8px;
-  background:rgba(212,168,67,0.08);border:1px solid var(--border);
-  border-radius:30px;padding:6px 14px;font-size:13px;
-}
+.user-badge{display:flex;align-items:center;gap:8px;background:rgba(212,168,67,0.08);border:1px solid var(--border);border-radius:30px;padding:6px 14px;font-size:13px}
 .user-badge .user-avatar{width:26px;height:26px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;color:#1a1000;font-weight:700}
-.logout-btn{
-  background:transparent;border:1px solid rgba(255,95,109,0.3);
-  color:var(--red);border-radius:8px;padding:6px 14px;
-  cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s;
-}
+.logout-btn{background:transparent;border:1px solid rgba(255,95,109,0.3);color:var(--red);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s}
 .logout-btn:hover{background:rgba(255,95,109,0.1);border-color:var(--red)}
-
-/* ── SIDE NAV ── */
 .app-body{display:flex;flex:1;align-items:flex-start}
-.sidenav{
-  width:220px;flex-shrink:0;
-  background:var(--dark2);
-  border-right:1px solid var(--border);
-  overflow-y:auto;padding:16px 0;position:sticky;top:58px;height:calc(100vh - 58px);align-self:flex-start;
-  display:flex;flex-direction:column;
-}
-.nav-section-label{
-  font-size:10px;font-weight:700;color:var(--muted);
-  letter-spacing:2px;text-transform:uppercase;
-  padding:12px 20px 6px;
-}
-.nav-item{
-  display:flex;align-items:center;gap:10px;
-  padding:11px 20px;cursor:pointer;
-  font-size:13px;color:var(--muted);font-weight:500;
-  transition:all .18s;border-left:3px solid transparent;
-  white-space:nowrap;
-}
+.sidenav{width:220px;flex-shrink:0;background:var(--dark2);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0;position:sticky;top:58px;height:calc(100vh - 58px);align-self:flex-start;display:flex;flex-direction:column}
+.nav-section-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:2px;text-transform:uppercase;padding:12px 20px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 20px;cursor:pointer;font-size:13px;color:var(--muted);font-weight:500;transition:all .18s;border-left:3px solid transparent;white-space:nowrap}
 .nav-item:hover{color:var(--text);background:rgba(255,255,255,0.04)}
 .nav-item.active{color:var(--gold);background:rgba(212,168,67,0.08);border-left-color:var(--gold)}
 .nav-icon{font-size:17px;flex-shrink:0}
-
-/* ── PAGE CONTENT ── */
 .page-area{flex:1;padding:28px;min-width:0;overflow-x:hidden}
-
 .page-header{margin-bottom:24px}
 .page-header h2{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold);margin-bottom:4px}
 .page-header p{font-size:13px;color:var(--muted)}
 
-/* ── CARDS ── */
-.card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:16px;padding:24px;margin-bottom:18px;
-  position:relative;overflow:hidden;
-}
+/* ════ CARDS ════ */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:18px;position:relative;overflow:hidden}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold3),var(--gold),var(--gold2))}
 .card-title{font-size:14px;font-weight:600;color:var(--gold2);margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .card-sub{font-size:12px;color:var(--muted);margin-top:-10px;margin-bottom:16px}
-
-/* ── FORM ELEMENTS ── */
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 textarea.inp{resize:vertical;min-height:80px}
 .inp[readonly]{opacity:.55;cursor:default;background:rgba(255,255,255,0.02)}
-
 .btn-sm{padding:8px 18px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
 .btn-primary{background:linear-gradient(135deg,var(--gold),#c08a20);color:#1a1000}
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(212,168,67,0.3)}
@@ -217,19 +99,25 @@ textarea.inp{resize:vertical;min-height:80px}
 .btn-success:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(61,220,132,0.3)}
 .btn-danger{background:linear-gradient(135deg,var(--red),#cc2233);color:white}
 .btn-danger:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(255,95,109,0.3)}
+.btn-purple{background:linear-gradient(135deg,var(--purple),#7c3aed);color:white}
+.btn-purple:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(167,139,250,0.3)}
 .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
 .btn-outline:hover{border-color:var(--gold);color:var(--gold)}
 .btn-full{width:100%;padding:12px;font-size:14px}
 
-/* ── STATUS BADGES ── */
+/* ════ BADGES ════ */
 .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
 .b-pending        {background:rgba(251,191,36,.15);color:var(--amber);border:1px solid rgba(251,191,36,.3)}
 .b-par-approved   {background:rgba(96,165,250,.15);color:var(--blue);border:1px solid rgba(96,165,250,.3)}
 .b-par-rejected   {background:rgba(255,95,109,.15);color:var(--red);border:1px solid rgba(255,95,109,.3)}
 .b-war-approved   {background:rgba(61,220,132,.15);color:var(--green);border:1px solid rgba(61,220,132,.3)}
 .b-war-rejected   {background:rgba(255,95,109,.15);color:var(--red);border:1px solid rgba(255,95,109,.3)}
+.b-assigned       {background:rgba(96,165,250,.15);color:var(--blue);border:1px solid rgba(96,165,250,.3)}
+.b-inprogress     {background:rgba(251,191,36,.15);color:var(--amber);border:1px solid rgba(251,191,36,.3)}
+.b-completed      {background:rgba(61,220,132,.15);color:var(--green);border:1px solid rgba(61,220,132,.3)}
+.b-closed         {background:rgba(122,122,154,.15);color:var(--muted);border:1px solid rgba(122,122,154,.3)}
 
-/* ── OUTPASS ITEM ── */
+/* ════ OUTPASS ITEMS ════ */
 .op-item{background:var(--card2);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:18px;margin-bottom:12px;transition:border-color .2s}
 .op-item:hover{border-color:var(--border)}
 .op-hdr{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:12px}
@@ -242,7 +130,7 @@ textarea.inp{resize:vertical;min-height:80px}
 .remarks-box{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--muted);font-style:italic;margin-top:8px}
 .remarks-box strong{font-style:normal;color:rgba(255,255,255,0.5);font-size:10px;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
 
-/* ── TIMELINE ── */
+/* ════ TIMELINE ════ */
 .timeline{display:flex;align-items:center;margin:10px 0 14px;overflow-x:auto;padding-bottom:4px;gap:0}
 .tl-step{display:flex;flex-direction:column;align-items:center;min-width:66px}
 .tl-dot{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,0.15);background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .3s}
@@ -253,15 +141,10 @@ textarea.inp{resize:vertical;min-height:80px}
 .tl-line{flex:1;height:2px;background:rgba(255,255,255,0.08);min-width:14px}
 .tl-line.done{background:var(--green)}
 
-/* ── ROOM ALLOCATION ── */
+/* ════ ROOM ALLOCATION ════ */
 .building-hdr{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold);margin-bottom:4px}
 .building-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
-.floor-btn{
-  display:flex;align-items:center;justify-content:space-between;
-  background:var(--card2);border:1px solid rgba(255,255,255,0.08);
-  border-radius:12px;padding:18px 22px;cursor:pointer;
-  margin-bottom:10px;transition:all .2s;
-}
+.floor-btn{display:flex;align-items:center;justify-content:space-between;background:var(--card2);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:18px 22px;cursor:pointer;margin-bottom:10px;transition:all .2s}
 .floor-btn:hover{border-color:var(--gold);background:rgba(212,168,67,0.07)}
 .floor-btn h3{font-size:14px;font-weight:600;color:var(--gold2);margin-bottom:3px}
 .floor-btn p{font-size:11px;color:var(--muted)}
@@ -272,8 +155,6 @@ textarea.inp{resize:vertical;min-height:80px}
 .sc-vacant{color:var(--green)}
 .sc-filled{color:var(--red)}
 .arrow{font-size:20px;color:var(--muted)}
-
-/* Floor view */
 #floor-view{display:none;padding-top:0}
 #floor-view.show{display:block}
 .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--gold);font-size:13px;cursor:pointer;margin-bottom:18px;padding:7px 14px;background:rgba(212,168,67,0.08);border:1px solid var(--border);border-radius:8px;transition:all .2s}
@@ -286,20 +167,22 @@ textarea.inp{resize:vertical;min-height:80px}
 .leg-dot{width:12px;height:12px;border-radius:3px}
 .leg-dot.v{background:var(--green)}.leg-dot.p{background:var(--amber)}.leg-dot.f{background:var(--red)}
 .zz-grid{display:flex;flex-direction:column;gap:10px}
-.zz-row{display:flex;gap:10px}
+.zz-row{display:flex;gap:10px;flex-wrap:wrap}
 .zz-row.shifted{padding-left:49px}
-.room-box{width:86px;height:86px;border-radius:11px;border:2px solid;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex-shrink:0}
+.room-box{width:86px;height:86px;border-radius:11px;border:2px solid;cursor:pointer;transition:all .25s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex-shrink:0;position:relative}
 .room-box.vacant{background:rgba(61,220,132,0.1);border-color:rgba(61,220,132,0.4)}
 .room-box.vacant:hover{background:rgba(61,220,132,0.22);border-color:var(--green);transform:scale(1.08);box-shadow:0 6px 20px rgba(61,220,132,0.3)}
 .room-box.partial{background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.4)}
 .room-box.partial:hover{background:rgba(251,191,36,0.22);border-color:var(--amber);transform:scale(1.08)}
 .room-box.full{background:rgba(255,95,109,0.08);border-color:rgba(255,95,109,0.3);cursor:not-allowed;opacity:.6}
+.room-box.just-allocated{animation:roomPop .5s ease}
+@keyframes roomPop{0%{transform:scale(1.2);box-shadow:0 0 30px rgba(212,168,67,0.6)}100%{transform:scale(1)}}
 .room-num{font-size:10px;font-weight:700;color:var(--text);text-align:center;line-height:1.3}
 .room-stats-mini{display:flex;gap:5px}
 .rsm span{font-size:9px;font-weight:700}
 .rsm.g span{color:var(--green)}.rsm.r span{color:var(--red)}
 
-/* ── ADMIN GRID ── */
+/* ════ STAFF GRID ════ */
 .staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
 .staff-card{background:var(--card2);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
 .staff-info h4{font-size:14px;color:var(--gold2);margin-bottom:3px}
@@ -308,11 +191,34 @@ textarea.inp{resize:vertical;min-height:80px}
 .del-btn{background:transparent;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:4px;opacity:.6;transition:opacity .2s}
 .del-btn:hover{opacity:1}
 
-/* ── EMPTY STATE ── */
+/* ════ COMPLAINT SPECIFIC ════ */
+.comp-item{background:var(--card2);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:18px;margin-bottom:12px;transition:border-color .2s}
+.comp-item:hover{border-color:var(--border)}
+.comp-hdr{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.comp-title{font-size:14px;font-weight:600;color:var(--gold2)}
+.comp-meta{font-size:11px;color:var(--muted);margin-top:3px}
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-bottom:12px}
+.comp-field label{font-size:10px;color:var(--muted);display:block;margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px}
+.comp-field span{font-size:13px;color:var(--text)}
+.comp-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.priority-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600}
+.pri-low   {background:rgba(61,220,132,.12);color:var(--green)}
+.pri-medium{background:rgba(251,191,36,.12);color:var(--amber)}
+.pri-high  {background:rgba(255,95,109,.12);color:var(--red)}
+.worker-assign-box{background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.2);border-radius:10px;padding:12px 16px;margin-top:10px;font-size:12px}
+.worker-assign-box strong{color:var(--blue);font-size:11px;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.comp-tl{display:flex;align-items:center;margin:10px 0 14px;overflow-x:auto;padding-bottom:4px}
+.rating-stars{display:flex;gap:4px;margin-top:6px}
+.star{font-size:18px;cursor:pointer;transition:transform .1s;color:var(--muted)}
+.star:hover,.star.lit{color:var(--gold);transform:scale(1.2)}
+.confirm-box{background:rgba(61,220,132,0.07);border:1px solid rgba(61,220,132,0.25);border-radius:10px;padding:14px 16px;margin-top:12px}
+.confirm-box p{font-size:12px;color:var(--green);margin-bottom:10px}
+
+/* ════ EMPTY STATE ════ */
 .empty{text-align:center;padding:40px 20px;color:var(--muted)}
 .empty-icon{font-size:44px;opacity:.35;margin-bottom:10px}
 
-/* ── MODAL ── */
+/* ════ MODAL ════ */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:2000;align-items:center;justify-content:center}
 .modal-bg.open{display:flex}
 .modal{background:var(--dark3);border:1px solid var(--border);border-radius:20px;padding:32px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;position:relative;animation:slideIn .3s ease}
@@ -324,75 +230,41 @@ textarea.inp{resize:vertical;min-height:80px}
 .modal-actions{display:flex;gap:10px;margin-top:18px}
 .sec-title{font-size:10px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin:18px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 
-/* ── TOAST ── */
-.toast{position:fixed;bottom:26px;right:26px;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;display:none;z-index:9999;animation:fadeUp .3s ease;max-width:320px;box-shadow:0 12px 32px rgba(0,0,0,0.4)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* ════ TOAST ════ */
+.toast{position:fixed;bottom:26px;right:26px;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;display:none;z-index:9999;max-width:320px;box-shadow:0 12px 32px rgba(0,0,0,0.4)}
 
-/* ── OTP BOX ── */
-.otp-hint{background:rgba(212,168,67,0.08);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--gold2);margin-bottom:16px;display:none}
-.otp-hint.show{display:flex;align-items:center;gap:10px}
-
-@media(max-width:640px){
-  .sidenav{display:none}
-  .form-row,.form-row3{grid-template-columns:1fr}
-  .topbar-logo{font-size:14px}
-  .role-grid{grid-template-columns:repeat(3,1fr)}
-}
+@media(max-width:640px){.sidenav{display:none}.form-row,.form-row3{grid-template-columns:1fr}.topbar-logo{font-size:14px}.role-grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════
-     LOGIN SCREEN
-══════════════════════════════════════ -->
+<!-- LOGIN SCREEN -->
 <div id="login-screen">
   <div class="login-bg"><div class="grid-lines"></div></div>
   <div class="login-wrap">
     <div class="login-logo">
       <span class="icon">🏢</span>
       <h1>Hostel Management</h1>
-      <p>Government College Of Engineering,Erode</p>
+      <p>Government College Of Engineering, Erode</p>
     </div>
-
     <div style="text-align:center;margin-bottom:14px">
-      <div class="conn-pill">
-        <div class="conn-dot" id="ld-dot"></div>
-        <span id="ld-text">Checking server...</span>
-      </div>
+      <div class="conn-pill"><div class="conn-dot" id="ld-dot"></div><span id="ld-text">Checking server...</span></div>
     </div>
-
     <div class="login-card">
       <div class="role-label">Select your role</div>
       <div class="role-grid">
-        <div class="role-btn" onclick="selectRole('student')" id="rb-student">
-          <span class="rb-icon">🎓</span><span class="rb-name">Student</span>
-        </div>
-        <div class="role-btn" onclick="selectRole('parent')" id="rb-parent">
-          <span class="rb-icon">👪</span><span class="rb-name">Parent</span>
-        </div>
-        <div class="role-btn" onclick="selectRole('warden')" id="rb-warden">
-          <span class="rb-icon">📋</span><span class="rb-name">Warden</span>
-        </div>
-        <div class="role-btn" onclick="selectRole('watchman')" id="rb-watchman">
-          <span class="rb-icon">💂</span><span class="rb-name">Watchman</span>
-        </div>
-        <div class="role-btn" onclick="selectRole('admin')" id="rb-admin" style="grid-column:1/-1">
-          <span class="rb-icon">🛡️</span><span class="rb-name">Admin</span>
-        </div>
+        <div class="role-btn" onclick="selectRole('student')" id="rb-student"><span class="rb-icon">🎓</span><span class="rb-name">Student</span></div>
+        <div class="role-btn" onclick="selectRole('parent')" id="rb-parent"><span class="rb-icon">👪</span><span class="rb-name">Parent</span></div>
+        <div class="role-btn" onclick="selectRole('warden')" id="rb-warden"><span class="rb-icon">📋</span><span class="rb-name">Warden</span></div>
+        <div class="role-btn" onclick="selectRole('watchman')" id="rb-watchman"><span class="rb-icon">💂</span><span class="rb-name">Watchman</span></div>
+        <div class="role-btn" onclick="selectRole('admin')" id="rb-admin" style="grid-column:1/-1"><span class="rb-icon">🛡️</span><span class="rb-name">Admin</span></div>
       </div>
-
       <div class="form-sep"></div>
-
-      <!-- STUDENT -->
       <div id="lf-student" style="display:none">
-        <div class="inp-group"><label class="inp-label">Roll Number</label>
-          <input class="inp" id="l-roll" placeholder="e.g. 22CS001"></div>
-        <div class="inp-group"><label class="inp-label">Registered Phone Number</label>
-          <input class="inp" id="l-sphone" type="tel" placeholder="10-digit phone"></div>
+        <div class="inp-group"><label class="inp-label">Roll Number</label><input class="inp" id="l-roll" placeholder="e.g. 22CS001"></div>
+        <div class="inp-group"><label class="inp-label">Registered Phone Number</label><input class="inp" id="l-sphone" type="tel" placeholder="10-digit phone"></div>
         <button class="btn-gold" onclick="doLogin()">Sign In →</button>
       </div>
-
-      <!-- PARENT -->
       <div id="lf-parent" style="display:none">
         <div class="inp-group"><label class="inp-label">Registered Phone Number</label>
           <div style="display:flex;gap:8px">
@@ -400,9 +272,7 @@ textarea.inp{resize:vertical;min-height:80px}
             <button class="btn-sm btn-outline" onclick="sendOTP()" id="otp-send-btn" style="white-space:nowrap">Send OTP</button>
           </div>
         </div>
-        <div class="otp-hint" id="otp-hint-box">
-          🔑 <span>Demo OTP: <strong id="demo-otp-val">------</strong> (In production this is sent via SMS)</span>
-        </div>
+        <div class="otp-hint" id="otp-hint-box">🔑 <span>Demo OTP: <strong id="demo-otp-val">------</strong> (In production sent via SMS)</span></div>
         <div id="otp-section" style="display:none">
           <div class="inp-group"><label class="inp-label">Enter OTP</label>
             <input class="inp" id="l-otp" placeholder="6-digit OTP" maxlength="6" style="letter-spacing:6px;font-size:20px;font-weight:700;text-align:center">
@@ -411,57 +281,34 @@ textarea.inp{resize:vertical;min-height:80px}
           <button class="btn-ghost" style="margin-top:8px" onclick="resendOTP()">Resend OTP</button>
         </div>
       </div>
-
-      <!-- WARDEN -->
       <div id="lf-warden" style="display:none">
-        <div class="inp-group"><label class="inp-label">Warden ID</label>
-          <input class="inp" id="l-wid" type="number" placeholder="e.g. 1"></div>
+        <div class="inp-group"><label class="inp-label">Warden ID</label><input class="inp" id="l-wid" type="number" placeholder="e.g. 1"></div>
         <button class="btn-gold" onclick="doLogin()">Sign In →</button>
       </div>
-
-      <!-- WATCHMAN -->
       <div id="lf-watchman" style="display:none">
-        <div class="inp-group"><label class="inp-label">Watchman ID</label>
-          <input class="inp" id="l-wmid" type="number" placeholder="e.g. 1"></div>
+        <div class="inp-group"><label class="inp-label">Watchman ID</label><input class="inp" id="l-wmid" type="number" placeholder="e.g. 1"></div>
         <button class="btn-gold" onclick="doLogin()">Sign In →</button>
       </div>
-
-      <!-- ADMIN -->
       <div id="lf-admin" style="display:none">
-        <div class="inp-group"><label class="inp-label">Username</label>
-          <input class="inp" id="l-uname" placeholder="admin"></div>
-        <div class="inp-group"><label class="inp-label">Password</label>
-          <input class="inp" id="l-pass" type="password" placeholder="••••••••"></div>
+        <div class="inp-group"><label class="inp-label">Username</label><input class="inp" id="l-uname" placeholder="admin"></div>
+        <div class="inp-group"><label class="inp-label">Password</label><input class="inp" id="l-pass" type="password" placeholder="••••••••"></div>
         <button class="btn-gold" onclick="doLogin()">Sign In →</button>
       </div>
-
-      <div id="lf-placeholder" style="text-align:center;color:var(--muted);font-size:13px;padding:10px 0">
-        ↑ Choose a role above to continue
-      </div>
+      <div id="lf-placeholder" style="text-align:center;color:var(--muted);font-size:13px;padding:10px 0">↑ Choose a role above to continue</div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     MAIN APP
-══════════════════════════════════════ -->
+<!-- MAIN APP -->
 <div id="app">
-  <!-- TOP BAR -->
   <div class="topbar">
     <div class="topbar-logo" onclick="goHome()">🏢 Hostel Management</div>
     <div class="topbar-spacer"></div>
-    <div class="user-badge">
-      <div class="user-avatar" id="app-avatar">?</div>
-      <span id="app-username">User</span>
-    </div>
+    <div class="user-badge"><div class="user-avatar" id="app-avatar">?</div><span id="app-username">User</span></div>
     <button class="logout-btn" onclick="logout()">Sign Out</button>
   </div>
-
   <div class="app-body">
-    <!-- SIDE NAV -->
     <div class="sidenav" id="sidenav"></div>
-
-    <!-- PAGE AREA -->
     <div class="page-area" id="page-area"></div>
   </div>
 </div>
@@ -499,9 +346,7 @@ textarea.inp{resize:vertical;min-height:80px}
       <div class="form-row">
         <div class="inp-group"><label class="inp-label">Parent Phone * <small style="color:var(--muted)">(used for login)</small></label><input class="inp" id="a-pphone" type="tel" required></div>
         <div class="inp-group"><label class="inp-label">Relation</label>
-          <select class="inp" id="a-prel">
-            <option>Father</option><option>Mother</option><option>Guardian</option>
-          </select>
+          <select class="inp" id="a-prel"><option>Father</option><option>Mother</option><option>Guardian</option></select>
         </div>
       </div>
       <div class="sec-title">Room (Auto-filled)</div>
@@ -516,7 +361,7 @@ textarea.inp{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- Action Modal (approve/reject) -->
+<!-- Action Modal (approve/reject outpass) -->
 <div class="modal-bg" id="action-modal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('action-modal')">✕</button>
@@ -530,53 +375,99 @@ textarea.inp{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- Toast -->
+<!-- Assign Worker Modal -->
+<div class="modal-bg" id="assign-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('assign-modal')">✕</button>
+    <h3>👷 Assign Worker</h3>
+    <div class="modal-sub" id="assign-modal-sub">Select a maintenance worker</div>
+    <div class="inp-group">
+      <label class="inp-label">Select Worker *</label>
+      <select class="inp" id="assign-worker-sel">
+        <option value="">Loading workers...</option>
+      </select>
+    </div>
+    <div class="inp-group">
+      <label class="inp-label">Manager Note (optional)</label>
+      <textarea class="inp" id="assign-note" placeholder="Instructions for the worker..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-sm btn-primary" onclick="submitAssign()">✅ Assign Worker</button>
+      <button class="btn-sm btn-outline" onclick="closeModal('assign-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Completion Modal -->
+<div class="modal-bg" id="confirm-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('confirm-modal')">✕</button>
+    <h3>✅ Confirm Completion</h3>
+    <div class="modal-sub">Let us know the work is done to your satisfaction</div>
+    <div class="inp-group" style="margin-top:12px">
+      <label class="inp-label">Feedback (optional)</label>
+      <textarea class="inp" id="confirm-feedback" placeholder="How was the work done?"></textarea>
+    </div>
+    <div class="inp-group">
+      <label class="inp-label">Rating</label>
+      <div class="rating-stars" id="rating-stars">
+        <span class="star" onclick="setRating(1)">★</span>
+        <span class="star" onclick="setRating(2)">★</span>
+        <span class="star" onclick="setRating(3)">★</span>
+        <span class="star" onclick="setRating(4)">★</span>
+        <span class="star" onclick="setRating(5)">★</span>
+      </div>
+    </div>
+    <input type="hidden" id="confirm-rating" value="0">
+    <div class="modal-actions">
+      <button class="btn-sm btn-success" onclick="submitConfirm()">✅ Mark as Completed</button>
+      <button class="btn-sm btn-outline" onclick="closeModal('confirm-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════
-// CONSTANTS & STATE
-// ═══════════════════════════════════════════════════
+// ═══════════════ CONSTANTS & STATE ═══════════════
 const API = '';
 const FLOOR_OFFSET = {0:0,1:29,2:58};
 const FLOOR_NAMES  = {0:'Ground Floor',1:'First Floor',2:'Second Floor'};
 const ROOM_CAP = 3, TOTAL_ROOMS = 29, LEFT = 15, RIGHT = 14;
 
-let session = null;  // { role, name, data }
+let session = null;
 let roomData = {};
 let curBlock = '', curFloor = 0, curRoom = 0;
 let actionCtx = {};
+let assignCtx = {};
+let confirmCtx = {};
 let otpParentId = null;
+let selectedRating = 0;
 
-// ═══════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════
+// ═══════════════ INIT ═══════════════
 function initRoomData(){
   ['D','L'].forEach(b=>{roomData[b]={};[0,1,2].forEach(f=>{roomData[b][f]={};const off=FLOOR_OFFSET[f];for(let r=1;r<=TOTAL_ROOMS;r++)roomData[b][f][off+r]={students:0}})})
 }
 
 async function checkConn(){
-  const dot=document.getElementById('ld-dot'), txt=document.getElementById('ld-text');
+  const dot=document.getElementById('ld-dot'),txt=document.getElementById('ld-text');
   try{
     const r=await fetch(API+'/api/room_stats');
     if(r.ok){
-      dot.className='conn-dot on'; txt.textContent='Server connected';
+      dot.className='conn-dot on';txt.textContent='Server connected';
       const data=await r.json();
       data.forEach(row=>{const{block:b,floor:f,room_number:rn,student_count:sc}=row;if(roomData[b]?.[f]?.[rn]!==undefined)roomData[b][f][rn].students=sc});
     } else throw 0;
   }catch{dot.className='conn-dot off';txt.textContent='Demo mode (no DB)'}
 }
 
-// ═══════════════════════════════════════════════════
-// LOGIN LOGIC
-// ═══════════════════════════════════════════════════
-let selRole = '';
-
+// ═══════════════ LOGIN ═══════════════
+let selRole='';
 function selectRole(role){
-  selRole = role;
+  selRole=role;
   ['student','parent','warden','watchman','admin'].forEach(r=>{
     document.getElementById(`rb-${r}`).classList.toggle('active',r===role);
-    document.getElementById(`lf-${r}`).style.display = r===role?'block':'none';
+    document.getElementById(`lf-${r}`).style.display=r===role?'block':'none';
   });
   document.getElementById('lf-placeholder').style.display='none';
 }
@@ -584,8 +475,7 @@ function selectRole(role){
 async function doLogin(){
   let payload={role:selRole};
   if(selRole==='student'){
-    const roll=document.getElementById('l-roll').value.trim();
-    const phone=document.getElementById('l-sphone').value.trim();
+    const roll=document.getElementById('l-roll').value.trim(),phone=document.getElementById('l-sphone').value.trim();
     if(!roll||!phone){toast('Enter roll number and phone','e');return}
     payload={...payload,roll_number:roll,phone};
   } else if(selRole==='warden'){
@@ -617,16 +507,15 @@ async function sendOTP(){
     if(result.success){
       otpParentId=result.parent_id;
       document.getElementById('otp-section').style.display='block';
-      const hintBox=document.getElementById('otp-hint-box');
-      hintBox.classList.add('show');
+      document.getElementById('otp-hint-box').classList.add('show');
       document.getElementById('demo-otp-val').textContent=result.otp_demo;
-      toast('OTP generated! Check the hint box.');
+      toast('OTP generated!');
     } else toast(result.message,'e');
   }catch{toast('Cannot connect to server','e')}
   document.getElementById('otp-send-btn').textContent='Send OTP';
 }
 
-async function resendOTP(){ document.getElementById('otp-section').style.display='none'; document.getElementById('otp-hint-box').classList.remove('show'); sendOTP(); }
+async function resendOTP(){document.getElementById('otp-section').style.display='none';document.getElementById('otp-hint-box').classList.remove('show');sendOTP()}
 
 async function verifyOTP(){
   const otp=document.getElementById('l-otp').value.trim();
@@ -642,20 +531,18 @@ async function verifyOTP(){
 function enterApp(result){
   session={role:result.role,name:result.name||result.data?.name||'User',data:result.data||{}};
   document.getElementById('login-screen').classList.add('hide');
-  setTimeout(()=>{document.getElementById('login-screen').style.display='none'},500);
-  const appEl=document.getElementById('app');
-  appEl.classList.add('show');
+  setTimeout(()=>document.getElementById('login-screen').style.display='none',500);
+  document.getElementById('app').classList.add('show');
   document.getElementById('app-username').textContent=session.name;
   document.getElementById('app-avatar').textContent=session.name.charAt(0).toUpperCase();
-  buildNav();
-  goHome();
+  buildNav(); goHome();
 }
 
 function logout(){
-  session=null; otpParentId=null;
+  session=null;otpParentId=null;
   document.getElementById('app').classList.remove('show');
   const ls=document.getElementById('login-screen');
-  ls.style.display='flex'; ls.classList.remove('hide');
+  ls.style.display='flex';ls.classList.remove('hide');
   selRole='';
   ['student','parent','warden','watchman','admin'].forEach(r=>{
     document.getElementById(`rb-${r}`).classList.remove('active');
@@ -666,75 +553,53 @@ function logout(){
   document.getElementById('otp-hint-box').classList.remove('show');
 }
 
-// ═══════════════════════════════════════════════════
-// NAV & ROUTING
-// ═══════════════════════════════════════════════════
-const NAV_DEFS = {
-  admin:    [{id:'admin-rooms',icon:'🛏️',label:'Room Allocation'},{id:'admin-wardens',icon:'📋',label:'Wardens'},{id:'admin-watchmen',icon:'💂',label:'Watchmen'},{id:'admin-outpasses',icon:'📄',label:'All Outpasses'}],
-  student:  [{id:'s-dashboard',icon:'🏠',label:'Dashboard'},{id:'s-apply',icon:'📝',label:'Apply Outpass'},{id:'s-history',icon:'📜',label:'My History'}],
-  parent:   [{id:'p-requests',icon:'📋',label:'Outpass Requests'}],
-  warden:   [{id:'w-requests',icon:'📋',label:'Outpass Requests'}],
-  watchman: [{id:'wm-approved',icon:'✅',label:'Approved Passes'}],
+// ═══════════════ NAV ═══════════════
+const NAV_DEFS={
+  admin:   [{id:'admin-rooms',icon:'🛏️',label:'Room Allocation'},{id:'admin-wardens',icon:'📋',label:'Wardens'},{id:'admin-watchmen',icon:'💂',label:'Watchmen'},{id:'admin-workers',icon:'👷',label:'Workers'},{id:'admin-outpasses',icon:'📄',label:'All Outpasses'},{id:'admin-complaints',icon:'🔧',label:'All Complaints'}],
+  student: [{id:'s-dashboard',icon:'🏠',label:'Dashboard'},{id:'s-apply',icon:'📝',label:'Apply Outpass'},{id:'s-history',icon:'📜',label:'My Outpasses'},{id:'s-complaint',icon:'🔧',label:'File Complaint'},{id:'s-comp-history',icon:'📋',label:'My Complaints'}],
+  parent:  [{id:'p-requests',icon:'📋',label:'Outpass Requests'}],
+  warden:  [{id:'w-requests',icon:'📋',label:'Outpass Review'},{id:'w-complaints',icon:'🔧',label:'Complaints'}],
+  watchman:[{id:'wm-approved',icon:'✅',label:'Approved Passes'}],
 };
 
 function buildNav(){
-  const items = NAV_DEFS[session.role] || [];
-  document.getElementById('sidenav').innerHTML =
-    `<div class="nav-section-label">Menu</div>` +
+  const items=NAV_DEFS[session.role]||[];
+  document.getElementById('sidenav').innerHTML=`<div class="nav-section-label">Menu</div>`+
     items.map(n=>`<div class="nav-item" id="nav-${n.id}" onclick="showView('${n.id}')"><span class="nav-icon">${n.icon}</span>${n.label}</div>`).join('');
 }
 
 function setActive(id){
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
-  const el=document.getElementById(`nav-${id}`);
-  if(el) el.classList.add('active');
+  const el=document.getElementById(`nav-${id}`);if(el)el.classList.add('active');
 }
 
-function goHome(){
-  const first = (NAV_DEFS[session.role]||[])[0];
-  if(first) showView(first.id);
-}
+function goHome(){const first=(NAV_DEFS[session.role]||[])[0];if(first)showView(first.id)}
 
 function showView(id){
   setActive(id);
-  const pa=document.getElementById('page-area');
-  pa.innerHTML='';
+  const pa=document.getElementById('page-area');pa.innerHTML='';
   const views={
-    // Admin
-    'admin-rooms': renderAdminRooms,
-    'admin-wardens': renderAdminWardens,
-    'admin-watchmen': renderAdminWatchmen,
-    'admin-outpasses': renderAdminOutpasses,
-    // Student
-    's-dashboard': renderStudentDash,
-    's-apply': renderStudentApply,
-    's-history': renderStudentHistory,
-    // Parent
-    'p-requests': renderParentRequests,
-    // Warden
-    'w-requests': renderWardenRequests,
-    // Watchman
-    'wm-approved': renderWatchmanList,
+    'admin-rooms':renderAdminRooms,'admin-wardens':renderAdminWardens,'admin-watchmen':renderAdminWatchmen,
+    'admin-workers':renderAdminWorkers,'admin-outpasses':renderAdminOutpasses,'admin-complaints':renderAdminComplaints,
+    's-dashboard':renderStudentDash,'s-apply':renderStudentApply,'s-history':renderStudentHistory,
+    's-complaint':renderStudentComplaint,'s-comp-history':renderStudentCompHistory,
+    'p-requests':renderParentRequests,
+    'w-requests':renderWardenRequests,'w-complaints':renderWardenComplaints,
+    'wm-approved':renderWatchmanList,
   };
-  if(views[id]) views[id](pa);
+  if(views[id])views[id](pa);
 }
 
-// ═══════════════════════════════════════════════════
-// ADMIN — ROOM ALLOCATION
-// ═══════════════════════════════════════════════════
+// ═══════════════ ADMIN — ROOMS ═══════════════
 function renderAdminRooms(pa){
-  pa.innerHTML=`<div class="page-header"><h2>🛏️ Room Allocation</h2><p>View rooms and allocate students to D &amp; L block</p></div>
-  <div id="building-view">
-    ${buildingHTML('D')}${buildingHTML('L')}
-  </div>
+  pa.innerHTML=`<div class="page-header"><h2>🛏️ Room Allocation</h2><p>View and allocate rooms in D &amp; L block</p></div>
+  <div id="building-view">${buildingHTML('D')}${buildingHTML('L')}</div>
   <div id="floor-view"></div>`;
   updateBadges();
 }
 
 function buildingHTML(b){
-  return `<div class="card">
-    <div class="building-hdr">${b} Block</div>
-    <div class="building-sub">3 Floors · 29 Rooms per Floor</div>
+  return `<div class="card"><div class="building-hdr">${b} Block</div><div class="building-sub">3 Floors · 29 Rooms per Floor</div>
     ${[0,1,2].map(f=>`<div class="floor-btn" onclick="openFloor('${b}',${f})">
       <div><h3>${['🏠 Ground','🔼 First','🔼 Second'][f]} Floor</h3><p>Rooms ${FLOOR_OFFSET[f]+1}–${FLOOR_OFFSET[f]+29} · ${b} Block</p></div>
       <div class="floor-stats">
@@ -748,63 +613,67 @@ function buildingHTML(b){
 
 function updateBadges(){
   ['D','L'].forEach(b=>[0,1,2].forEach(f=>{
-    let filled=0,vacant=0; const off=FLOOR_OFFSET[f];
+    let filled=0,vacant=0;const off=FLOOR_OFFSET[f];
     for(let r=1;r<=TOTAL_ROOMS;r++) roomData[b][f][off+r]?.students>=ROOM_CAP?filled++:vacant++;
-    const ve=document.getElementById(`${b}-${f}-v`), fe=document.getElementById(`${b}-${f}-f`);
-    if(ve) ve.textContent=vacant;
-    if(fe) fe.textContent=filled;
+    const ve=document.getElementById(`${b}-${f}-v`),fe=document.getElementById(`${b}-${f}-f`);
+    if(ve)ve.textContent=vacant;if(fe)fe.textContent=filled;
   }));
 }
 
 function openFloor(block,floorIdx){
-  curBlock=block; curFloor=floorIdx;
+  curBlock=block;curFloor=floorIdx;
   document.getElementById('building-view').style.display='none';
-  const fv=document.getElementById('floor-view');
-  fv.classList.add('show');
+  const fv=document.getElementById('floor-view');fv.classList.add('show');
   const off=FLOOR_OFFSET[floorIdx];
-  fv.innerHTML=`
-    <div class="back-link" onclick="backToBuildings()">← Back to Blocks</div>
+  fv.innerHTML=`<div class="back-link" onclick="backToBuildings()">← Back to Blocks</div>
     <div class="page-header"><h2>${block} Block — ${FLOOR_NAMES[floorIdx]}</h2></div>
-    <div class="legend">
-      <div class="leg-item"><div class="leg-dot v"></div>Vacant</div>
-      <div class="leg-item"><div class="leg-dot p"></div>Partial</div>
-      <div class="leg-item"><div class="leg-dot f"></div>Full</div>
-    </div>
+    <div class="legend"><div class="leg-item"><div class="leg-dot v"></div>Vacant</div><div class="leg-item"><div class="leg-dot p"></div>Partial</div><div class="leg-item"><div class="leg-dot f"></div>Full</div></div>
     <div class="wing-box"><div class="wing-title">🏠 Left Wing &nbsp;<span style="font-weight:300;color:var(--muted)">Rooms ${off+1}–${off+LEFT}</span></div><div class="zz-grid" id="wg-left"></div></div>
-    <div class="wing-box"><div class="wing-title">🏠 Right Wing &nbsp;<span style="font-weight:300;color:var(--muted)">Rooms ${off+LEFT+1}–${off+TOTAL_ROOMS}</span></div><div class="zz-grid" id="wg-right"></div></div>
-  `;
-  renderWing('wg-left',  1,          LEFT,  8);
-  renderWing('wg-right', LEFT+1, RIGHT, 7);
+    <div class="wing-box"><div class="wing-title">🏠 Right Wing &nbsp;<span style="font-weight:300;color:var(--muted)">Rooms ${off+LEFT+1}–${off+TOTAL_ROOMS}</span></div><div class="zz-grid" id="wg-right"></div></div>`;
+  renderWing('wg-left',1,LEFT,8);renderWing('wg-right',LEFT+1,RIGHT,7);
 }
 
 function backToBuildings(){
   document.getElementById('building-view').style.display='block';
-  const fv=document.getElementById('floor-view'); fv.classList.remove('show'); fv.innerHTML='';
+  const fv=document.getElementById('floor-view');fv.classList.remove('show');fv.innerHTML='';
 }
 
 function renderWing(gridId,startPos,count,row0n){
-  const grid=document.getElementById(gridId); grid.innerHTML='';
-  const off=FLOOR_OFFSET[curFloor]; const end=startPos+count; let pos=startPos;
-  const r0=document.createElement('div'); r0.className='zz-row';
-  for(let i=0;i<row0n&&pos<end;i++,pos++) r0.appendChild(makeRoom(off+pos));
+  const grid=document.getElementById(gridId);grid.innerHTML='';
+  const off=FLOOR_OFFSET[curFloor];const end=startPos+count;let pos=startPos;
+  const r0=document.createElement('div');r0.className='zz-row';
+  for(let i=0;i<row0n&&pos<end;i++,pos++)r0.appendChild(makeRoom(off+pos));
   grid.appendChild(r0);
-  if(pos<end){const r1=document.createElement('div'); r1.className='zz-row shifted';
-    while(pos<end){r1.appendChild(makeRoom(off+pos));pos++;} grid.appendChild(r1);}
+  if(pos<end){const r1=document.createElement('div');r1.className='zz-row shifted';
+    while(pos<end){r1.appendChild(makeRoom(off+pos));pos++;}grid.appendChild(r1);}
 }
 
 function makeRoom(absRoom){
   const stu=roomData[curBlock][curFloor][absRoom]?.students??0;
   const vac=ROOM_CAP-stu;
   const cls=stu>=ROOM_CAP?'full':stu>0?'partial':'vacant';
-  const box=document.createElement('div'); box.className=`room-box ${cls}`;
+  const box=document.createElement('div');box.className=`room-box ${cls}`;box.id=`room-box-${absRoom}`;
   box.title=`Room ${absRoom}: ${vac} vacant, ${stu} filled`;
-  if(cls!=='full') box.onclick=()=>openAllocModal(curBlock,curFloor,absRoom);
+  if(cls!=='full')box.onclick=()=>openAllocModal(curBlock,curFloor,absRoom);
   box.innerHTML=`<div class="room-num">Room<br>${absRoom}</div>
-    <div class="room-stats-mini">
-      <div class="rsm g"><span>${vac}V</span></div>
-      <div class="rsm r"><span>${stu}F</span></div>
-    </div>`;
+    <div class="room-stats-mini"><div class="rsm g"><span id="room-v-${absRoom}">${vac}V</span></div><div class="rsm r"><span id="room-f-${absRoom}">${stu}F</span></div></div>`;
   return box;
+}
+
+// ★ LIVE UI UPDATE after allocation ★
+function updateRoomBoxUI(absRoom){
+  const stu=roomData[curBlock][curFloor][absRoom]?.students??0;
+  const vac=ROOM_CAP-stu;
+  const box=document.getElementById(`room-box-${absRoom}`);
+  if(!box)return;
+  const newCls=stu>=ROOM_CAP?'full':stu>0?'partial':'vacant';
+  box.className=`room-box ${newCls} just-allocated`;
+  box.title=`Room ${absRoom}: ${vac} vacant, ${stu} filled`;
+  if(newCls!=='full')box.onclick=()=>openAllocModal(curBlock,curFloor,absRoom);
+  else box.onclick=null;
+  const vEl=document.getElementById(`room-v-${absRoom}`);const fEl=document.getElementById(`room-f-${absRoom}`);
+  if(vEl)vEl.textContent=`${vac}V`;if(fEl)fEl.textContent=`${stu}F`;
+  setTimeout(()=>box.classList.remove('just-allocated'),600);
 }
 
 function openAllocModal(block,floorIdx,absRoom){
@@ -814,50 +683,48 @@ function openAllocModal(block,floorIdx,absRoom){
   document.getElementById('a-floor-name').value=FLOOR_NAMES[floorIdx];
   document.getElementById('a-floor-idx').value=floorIdx;
   document.getElementById('a-room').value=absRoom;
-  const btn=document.getElementById('a-submit-btn'); btn.disabled=false; btn.textContent='✅ Allocate Room';
+  const btn=document.getElementById('a-submit-btn');btn.disabled=false;btn.textContent='✅ Allocate Room';
   openModal('alloc-modal');
 }
 
 async function submitAlloc(e){
   e.preventDefault();
-  const btn=document.getElementById('a-submit-btn'); btn.disabled=true; btn.textContent='⏳ Saving...';
+  const btn=document.getElementById('a-submit-btn');btn.disabled=true;btn.textContent='⏳ Saving...';
   const payload={
-    student_id:document.getElementById('a-sid').value.trim(),
-    name:document.getElementById('a-name').value.trim(),
-    roll_number:document.getElementById('a-roll').value.trim(),
-    dept:document.getElementById('a-dept').value,
-    year:document.getElementById('a-year').value,
-    phone:document.getElementById('a-phone').value.trim(),
-    parent_name:document.getElementById('a-pname').value.trim(),
-    parent_phone:document.getElementById('a-pphone').value.trim(),
+    student_id:document.getElementById('a-sid').value.trim(),name:document.getElementById('a-name').value.trim(),
+    roll_number:document.getElementById('a-roll').value.trim(),dept:document.getElementById('a-dept').value,
+    year:document.getElementById('a-year').value,phone:document.getElementById('a-phone').value.trim(),
+    parent_name:document.getElementById('a-pname').value.trim(),parent_phone:document.getElementById('a-pphone').value.trim(),
     parent_relation:document.getElementById('a-prel').value,
-    block:curBlock, floor:document.getElementById('a-floor-idx').value, room_number:curRoom
+    block:curBlock,floor:document.getElementById('a-floor-idx').value,room_number:curRoom
   };
   if(!payload.dept||!payload.year){toast('Select department and year','e');btn.disabled=false;btn.textContent='✅ Allocate Room';return}
   try{
     const res=await fetch(API+'/api/allocate_room',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const result=await res.json();
     if(result.success){
-      roomData[curBlock][curFloor][curRoom].students++;
+      // Update local data with server's accurate count
+      const newCount=result.new_student_count??roomData[curBlock][curFloor][curRoom].students+1;
+      roomData[curBlock][curFloor][curRoom].students=newCount;
       closeModal('alloc-modal');
-      openFloor(curBlock,curFloor);
+      // ★ Live update the room box without full re-render ★
+      updateRoomBoxUI(curRoom);
       updateBadges();
       toast(result.message);
-    } else {toast(result.message,'e'); btn.disabled=false; btn.textContent='✅ Allocate Room';}
+      e.target.reset();
+    } else {toast(result.message,'e');btn.disabled=false;btn.textContent='✅ Allocate Room';}
   }catch{
-    roomData[curBlock][curFloor][curRoom].students++;
-    closeModal('alloc-modal'); openFloor(curBlock,curFloor); updateBadges();
-    toast('Allocated (demo mode)');
+    // Demo mode fallback
+    roomData[curBlock][curFloor][curRoom].students=Math.min(ROOM_CAP,roomData[curBlock][curFloor][curRoom].students+1);
+    closeModal('alloc-modal');updateRoomBoxUI(curRoom);updateBadges();
+    toast('Allocated (demo mode)');e.target.reset();
   }
 }
 
-// ═══════════════════════════════════════════════════
-// ADMIN — WARDENS
-// ═══════════════════════════════════════════════════
+// ═══════════════ ADMIN — WARDENS ═══════════════
 function renderAdminWardens(pa){
   pa.innerHTML=`<div class="page-header"><h2>📋 Warden Management</h2><p>Only admins can add or remove wardens</p></div>
-  <div class="card">
-    <div class="card-title">➕ Add New Warden</div>
+  <div class="card"><div class="card-title">➕ Add New Warden</div>
     <form onsubmit="addWarden(event)">
       <div class="form-row">
         <div class="inp-group"><label class="inp-label">Full Name *</label><input class="inp" id="aw-name" placeholder="Warden name" required></div>
@@ -866,67 +733,45 @@ function renderAdminWardens(pa){
       <div class="form-row">
         <div class="inp-group"><label class="inp-label">Phone *</label><input class="inp" id="aw-phone" type="tel" placeholder="10-digit" required></div>
         <div class="inp-group"><label class="inp-label">Year In-charge *</label>
-          <select class="inp" id="aw-year" required>
-            <option value="">Select</option>
-            <option value="1">1st Year</option><option value="2">2nd Year</option>
-            <option value="3">3rd Year</option><option value="4">4th Year</option>
-          </select>
+          <select class="inp" id="aw-year" required><option value="">Select</option><option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option></select>
         </div>
       </div>
       <button type="submit" class="btn-sm btn-primary" id="aw-btn" style="margin-top:4px">➕ Add Warden</button>
     </form>
   </div>
-  <div class="card">
-    <div class="card-title">👥 Current Wardens</div>
-    <div id="warden-list-admin"><div class="empty"><div class="empty-icon">⏳</div>Loading...</div></div>
-  </div>`;
+  <div class="card"><div class="card-title">👥 Current Wardens</div><div id="warden-list-admin"><div class="empty"><div class="empty-icon">⏳</div>Loading...</div></div></div>`;
   loadAdminWardens();
 }
 
 async function loadAdminWardens(){
-  try{
-    const r=await fetch(API+'/api/admin/wardens'); const data=await r.json();
+  try{const r=await fetch(API+'/api/admin/wardens');const data=await r.json();
     const el=document.getElementById('warden-list-admin');
     if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">👤</div>No wardens yet.</div>';return}
-    el.innerHTML=`<div class="staff-grid">${data.map(w=>`<div class="staff-card">
-      <div class="staff-info"><h4>${w.name}</h4><p>${w.email} · ${w.phone}</p></div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div class="staff-badge">Year ${w.year}</div>
-        <button class="del-btn" onclick="deleteWarden(${w.warden_id},'${w.name}')">🗑</button>
-      </div>
-    </div>`).join('')}</div>`;
+    el.innerHTML=`<div class="staff-grid">${data.map(w=>`<div class="staff-card"><div class="staff-info"><h4>${w.name}</h4><p>${w.email} · ${w.phone}</p></div><div style="display:flex;align-items:center;gap:8px"><div class="staff-badge">Year ${w.year}</div><button class="del-btn" onclick="deleteWarden(${w.warden_id},'${w.name}')">🗑</button></div></div>`).join('')}</div>`;
   }catch{document.getElementById('warden-list-admin').innerHTML='<div class="empty"><div class="empty-icon">❌</div>Backend offline.</div>'}
 }
 
 async function addWarden(e){
-  e.preventDefault(); const btn=document.getElementById('aw-btn'); btn.disabled=true; btn.textContent='Adding...';
+  e.preventDefault();const btn=document.getElementById('aw-btn');btn.disabled=true;btn.textContent='Adding...';
   const payload={name:document.getElementById('aw-name').value.trim(),email:document.getElementById('aw-email').value.trim(),phone:document.getElementById('aw-phone').value.trim(),year:document.getElementById('aw-year').value};
-  try{
-    const r=await fetch(API+'/api/admin/add_warden',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  try{const r=await fetch(API+'/api/admin/add_warden',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const result=await r.json();
-    if(result.success){e.target.reset();toast(result.message);loadAdminWardens();}
-    else toast(result.message,'e');
+    if(result.success){e.target.reset();toast(result.message);loadAdminWardens();}else toast(result.message,'e');
   }catch{toast('Backend offline','e')}
-  btn.disabled=false; btn.textContent='➕ Add Warden';
+  btn.disabled=false;btn.textContent='➕ Add Warden';
 }
 
 async function deleteWarden(id,name){
-  if(!confirm(`Delete warden "${name}"?`)) return;
-  try{
-    const r=await fetch(API+'/api/admin/delete_warden',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({warden_id:id})});
-    const result=await r.json();
-    toast(result.message,result.success?'':'e');
-    if(result.success) loadAdminWardens();
+  if(!confirm(`Delete warden "${name}"?`))return;
+  try{const r=await fetch(API+'/api/admin/delete_warden',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({warden_id:id})});
+    const result=await r.json();toast(result.message,result.success?'':'e');if(result.success)loadAdminWardens();
   }catch{toast('Error','e')}
 }
 
-// ═══════════════════════════════════════════════════
-// ADMIN — WATCHMEN
-// ═══════════════════════════════════════════════════
+// ═══════════════ ADMIN — WATCHMEN ═══════════════
 function renderAdminWatchmen(pa){
-  pa.innerHTML=`<div class="page-header"><h2>💂 Watchman Management</h2><p>Manage security staff who verify student exit/entry</p></div>
-  <div class="card">
-    <div class="card-title">➕ Add New Watchman</div>
+  pa.innerHTML=`<div class="page-header"><h2>💂 Watchman Management</h2><p>Manage security staff</p></div>
+  <div class="card"><div class="card-title">➕ Add New Watchman</div>
     <form onsubmit="addWatchman(event)">
       <div class="form-row">
         <div class="inp-group"><label class="inp-label">Full Name *</label><input class="inp" id="wm-name" placeholder="Watchman name" required></div>
@@ -934,191 +779,263 @@ function renderAdminWatchmen(pa){
       </div>
       <div class="form-row">
         <div class="inp-group"><label class="inp-label">Email</label><input class="inp" id="wm-email" type="email" placeholder="Optional"></div>
-        <div class="inp-group"><label class="inp-label">Shift</label>
-          <select class="inp" id="wm-shift">
-            <option>Morning</option><option>Evening</option><option>Night</option>
-          </select>
-        </div>
+        <div class="inp-group"><label class="inp-label">Shift</label><select class="inp" id="wm-shift"><option>Morning</option><option>Evening</option><option>Night</option></select></div>
       </div>
       <button type="submit" class="btn-sm btn-primary" id="wm-add-btn" style="margin-top:4px">➕ Add Watchman</button>
     </form>
   </div>
-  <div class="card">
-    <div class="card-title">👥 Current Watchmen</div>
-    <div id="watchman-list-admin"><div class="empty"><div class="empty-icon">⏳</div>Loading...</div></div>
-  </div>`;
+  <div class="card"><div class="card-title">👥 Current Watchmen</div><div id="watchman-list-admin"><div class="empty"><div class="empty-icon">⏳</div>Loading...</div></div></div>`;
   loadAdminWatchmen();
 }
 
 async function loadAdminWatchmen(){
-  try{
-    const r=await fetch(API+'/api/admin/watchmen'); const data=await r.json();
+  try{const r=await fetch(API+'/api/admin/watchmen');const data=await r.json();
     const el=document.getElementById('watchman-list-admin');
     if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">💂</div>No watchmen yet.</div>';return}
-    el.innerHTML=`<div class="staff-grid">${data.map(w=>`<div class="staff-card">
-      <div class="staff-info"><h4>${w.name}</h4><p>${w.phone} · ID: ${w.watchman_id}</p></div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div class="staff-badge">${w.shift}</div>
-        <button class="del-btn" onclick="deleteWatchman(${w.watchman_id},'${w.name}')">🗑</button>
-      </div>
-    </div>`).join('')}</div>`;
+    el.innerHTML=`<div class="staff-grid">${data.map(w=>`<div class="staff-card"><div class="staff-info"><h4>${w.name}</h4><p>${w.phone} · ID: ${w.watchman_id}</p></div><div style="display:flex;align-items:center;gap:8px"><div class="staff-badge">${w.shift}</div><button class="del-btn" onclick="deleteWatchman(${w.watchman_id},'${w.name}')">🗑</button></div></div>`).join('')}</div>`;
   }catch{document.getElementById('watchman-list-admin').innerHTML='<div class="empty"><div class="empty-icon">❌</div>Backend offline.</div>'}
 }
 
 async function addWatchman(e){
-  e.preventDefault(); const btn=document.getElementById('wm-add-btn'); btn.disabled=true; btn.textContent='Adding...';
+  e.preventDefault();const btn=document.getElementById('wm-add-btn');btn.disabled=true;btn.textContent='Adding...';
   const payload={name:document.getElementById('wm-name').value.trim(),phone:document.getElementById('wm-phone').value.trim(),email:document.getElementById('wm-email').value.trim(),shift:document.getElementById('wm-shift').value};
-  try{
-    const r=await fetch(API+'/api/admin/add_watchman',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  try{const r=await fetch(API+'/api/admin/add_watchman',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const result=await r.json();
-    if(result.success){e.target.reset();toast(result.message);loadAdminWatchmen();}
-    else toast(result.message,'e');
+    if(result.success){e.target.reset();toast(result.message);loadAdminWatchmen();}else toast(result.message,'e');
   }catch{toast('Backend offline','e')}
-  btn.disabled=false; btn.textContent='➕ Add Watchman';
+  btn.disabled=false;btn.textContent='➕ Add Watchman';
 }
 
 async function deleteWatchman(id,name){
-  if(!confirm(`Delete watchman "${name}"?`)) return;
-  try{
-    const r=await fetch(API+'/api/admin/delete_watchman',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({watchman_id:id})});
-    const result=await r.json();
-    toast(result.message,result.success?'':'e');
-    if(result.success) loadAdminWatchmen();
+  if(!confirm(`Delete watchman "${name}"?`))return;
+  try{const r=await fetch(API+'/api/admin/delete_watchman',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({watchman_id:id})});
+    const result=await r.json();toast(result.message,result.success?'':'e');if(result.success)loadAdminWatchmen();
   }catch{toast('Error','e')}
 }
 
-// ═══════════════════════════════════════════════════
-// ADMIN — ALL OUTPASSES
-// ═══════════════════════════════════════════════════
+// ═══════════════ ADMIN — WORKERS ═══════════════
+function renderAdminWorkers(pa){
+  pa.innerHTML=`<div class="page-header"><h2>👷 Worker Management</h2><p>Maintenance workers for complaint assignments</p></div>
+  <div class="card"><div class="card-title">➕ Add New Worker</div>
+    <form onsubmit="addWorker(event)">
+      <div class="form-row">
+        <div class="inp-group"><label class="inp-label">Full Name *</label><input class="inp" id="wk-name" placeholder="Worker name" required></div>
+        <div class="inp-group"><label class="inp-label">Phone *</label><input class="inp" id="wk-phone" type="tel" placeholder="10-digit" required></div>
+      </div>
+      <div class="form-row">
+        <div class="inp-group"><label class="inp-label">Email</label><input class="inp" id="wk-email" type="email" placeholder="Optional"></div>
+        <div class="inp-group"><label class="inp-label">Category *</label>
+          <select class="inp" id="wk-cat">
+            <option>Plumbing</option><option>Electrical</option><option>Carpentry</option><option>Cleaning</option><option>General</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn-sm btn-primary" id="wk-add-btn" style="margin-top:4px">➕ Add Worker</button>
+    </form>
+  </div>
+  <div class="card"><div class="card-title">👷 Current Workers</div><div id="worker-list-admin"><div class="empty"><div class="empty-icon">⏳</div>Loading...</div></div></div>`;
+  loadAdminWorkers();
+}
+
+async function loadAdminWorkers(){
+  try{const r=await fetch(API+'/api/admin/workers');const data=await r.json();
+    const el=document.getElementById('worker-list-admin');
+    if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">👷</div>No workers yet.</div>';return}
+    const cats={'Plumbing':'🔧','Electrical':'⚡','Carpentry':'🪚','Cleaning':'🧹','General':'🛠️'};
+    el.innerHTML=`<div class="staff-grid">${data.map(w=>`<div class="staff-card"><div class="staff-info"><h4>${cats[w.category]||'🛠️'} ${w.name}</h4><p>${w.phone}</p></div><div style="display:flex;align-items:center;gap:8px"><div class="staff-badge">${w.category}</div><button class="del-btn" onclick="deleteWorker(${w.worker_id},'${w.name}')">🗑</button></div></div>`).join('')}</div>`;
+  }catch{document.getElementById('worker-list-admin').innerHTML='<div class="empty"><div class="empty-icon">❌</div>Backend offline.</div>'}
+}
+
+async function addWorker(e){
+  e.preventDefault();const btn=document.getElementById('wk-add-btn');btn.disabled=true;btn.textContent='Adding...';
+  const payload={name:document.getElementById('wk-name').value.trim(),phone:document.getElementById('wk-phone').value.trim(),email:document.getElementById('wk-email').value.trim(),category:document.getElementById('wk-cat').value};
+  try{const r=await fetch(API+'/api/admin/add_worker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const result=await r.json();
+    if(result.success){e.target.reset();toast(result.message);loadAdminWorkers();}else toast(result.message,'e');
+  }catch{toast('Backend offline','e')}
+  btn.disabled=false;btn.textContent='➕ Add Worker';
+}
+
+async function deleteWorker(id,name){
+  if(!confirm(`Remove worker "${name}"?`))return;
+  try{const r=await fetch(API+'/api/admin/delete_worker',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({worker_id:id})});
+    const result=await r.json();toast(result.message,result.success?'':'e');if(result.success)loadAdminWorkers();
+  }catch{toast('Error','e')}
+}
+
+// ═══════════════ ADMIN — OUTPASSES ═══════════════
 async function renderAdminOutpasses(pa){
   pa.innerHTML=`<div class="page-header"><h2>📄 All Outpass Requests</h2><p>Full system overview</p></div>
   <div id="admin-op-list"><div class="empty"><div class="empty-icon">⏳</div>Loading...</div></div>`;
-  try{
-    const r=await fetch(API+'/api/outpass/all'); const data=await r.json();
+  try{const r=await fetch(API+'/api/outpass/all');const data=await r.json();
     const el=document.getElementById('admin-op-list');
     if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">📋</div>No outpasses yet.</div>';return}
     el.innerHTML=data.map(op=>renderOpCard(op,'admin')).join('');
   }catch{document.getElementById('admin-op-list').innerHTML='<div class="empty"><div class="empty-icon">❌</div>Backend offline.</div>'}
 }
 
-// ═══════════════════════════════════════════════════
-// STUDENT
-// ═══════════════════════════════════════════════════
+// ═══════════════ ADMIN — ALL COMPLAINTS ═══════════════
+async function renderAdminComplaints(pa){
+  pa.innerHTML=`<div class="page-header"><h2>🔧 All Complaints</h2><p>System-wide maintenance complaints</p></div>
+  <div id="admin-comp-list"><div class="empty"><div class="empty-icon">⏳</div>Loading...</div></div>`;
+  try{const r=await fetch(API+'/api/complaint/all');const data=await r.json();
+    const el=document.getElementById('admin-comp-list');
+    if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔧</div>No complaints yet.</div>';return}
+    el.innerHTML=data.map(c=>renderCompCard(c,'admin')).join('');
+  }catch{document.getElementById('admin-comp-list').innerHTML='<div class="empty"><div class="empty-icon">❌</div>Backend offline.</div>'}
+}
+
+// ═══════════════ STUDENT ═══════════════
 function renderStudentDash(pa){
   const s=session.data;
   pa.innerHTML=`<div class="page-header"><h2>👋 Welcome, ${s.name}</h2><p>Your hostel dashboard</p></div>
-  <div class="card">
-    <div class="card-title">🎓 My Details</div>
+  <div class="card"><div class="card-title">🎓 My Details</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
       ${[['Roll Number',s.roll_number],['Department',s.dept],['Year',s.year],['Block',s.block+' Block'],['Room',s.room_number],['Phone',s.phone]].map(([l,v])=>`<div style="background:var(--card2);border-radius:10px;padding:12px 16px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">${l}</div><div style="font-size:14px;margin-top:3px">${v||'—'}</div></div>`).join('')}
     </div>
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
       <div style="font-size:11px;color:var(--muted);margin-bottom:6px">PARENT / GUARDIAN</div>
-      <div style="font-size:14px;color:var(--text)">${s.parent_name||'—'} &nbsp;·&nbsp; ${s.parent_phone||'—'}</div>
+      <div style="font-size:14px">${s.parent_name||'—'} &nbsp;·&nbsp; ${s.parent_phone||'—'}</div>
     </div>
   </div>`;
 }
 
 function renderStudentApply(pa){
   pa.innerHTML=`<div class="page-header"><h2>📝 Apply for Outpass</h2><p>Submit a request to leave the hostel temporarily</p></div>
-  <div class="card">
-    <form onsubmit="submitOutpass(event)">
-      <div class="inp-group"><label class="inp-label">Destination *</label><input class="inp" id="op-dest" placeholder="e.g. Home - Chennai" required></div>
-      <div class="inp-group"><label class="inp-label">Reason / Purpose *</label><textarea class="inp" id="op-reason" placeholder="Explain why you need to leave..." required></textarea></div>
-      <div class="form-row">
-        <div class="inp-group"><label class="inp-label">Date &amp; Time of Leaving *</label><input class="inp" id="op-leave" type="datetime-local" required></div>
-        <div class="inp-group"><label class="inp-label">Expected Return *</label><input class="inp" id="op-ret" type="datetime-local" required></div>
-      </div>
-      <div style="background:rgba(212,168,67,0.07);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;font-size:12px;color:var(--muted)">
-        ℹ️ Your request will first go to your <strong style="color:var(--gold2)">Parent</strong> for approval, then to the <strong style="color:var(--gold2)">Warden</strong>.
-      </div>
-      <button type="submit" class="btn-gold btn-full" id="op-submit-btn">📤 Submit Request</button>
-    </form>
-  </div>`;
+  <div class="card"><form onsubmit="submitOutpass(event)">
+    <div class="inp-group"><label class="inp-label">Destination *</label><input class="inp" id="op-dest" placeholder="e.g. Home - Chennai" required></div>
+    <div class="inp-group"><label class="inp-label">Reason / Purpose *</label><textarea class="inp" id="op-reason" placeholder="Explain why you need to leave..." required></textarea></div>
+    <div class="form-row">
+      <div class="inp-group"><label class="inp-label">Date &amp; Time of Leaving *</label><input class="inp" id="op-leave" type="datetime-local" required></div>
+      <div class="inp-group"><label class="inp-label">Expected Return *</label><input class="inp" id="op-ret" type="datetime-local" required></div>
+    </div>
+    <div style="background:rgba(212,168,67,0.07);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;font-size:12px;color:var(--muted)">
+      ℹ️ Your request will first go to your <strong style="color:var(--gold2)">Parent</strong> for approval, then to the <strong style="color:var(--gold2)">Warden</strong>.
+    </div>
+    <button type="submit" class="btn-gold btn-full" id="op-submit-btn">📤 Submit Request</button>
+  </form></div>`;
 }
 
 async function submitOutpass(e){
-  e.preventDefault(); const btn=document.getElementById('op-submit-btn'); btn.disabled=true; btn.textContent='Submitting...';
+  e.preventDefault();const btn=document.getElementById('op-submit-btn');btn.disabled=true;btn.textContent='Submitting...';
   const fmt=dt=>dt.replace('T',' ').substring(0,16);
   const payload={student_id:session.data.student_id,destination:document.getElementById('op-dest').value.trim(),reason:document.getElementById('op-reason').value.trim(),leave_datetime:fmt(document.getElementById('op-leave').value),return_datetime:fmt(document.getElementById('op-ret').value)};
-  try{
-    const r=await fetch(API+'/api/outpass/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  try{const r=await fetch(API+'/api/outpass/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const result=await r.json();
-    if(result.success){e.target.reset();toast(result.message);showView('s-history');}
-    else toast(result.message,'e');
+    if(result.success){e.target.reset();toast(result.message);showView('s-history');}else toast(result.message,'e');
   }catch{toast('Backend offline','e')}
-  btn.disabled=false; btn.textContent='📤 Submit Request';
+  btn.disabled=false;btn.textContent='📤 Submit Request';
 }
 
 async function renderStudentHistory(pa){
   pa.innerHTML=`<div class="page-header"><h2>📜 My Outpass History</h2><p>All your past and pending requests</p></div>
   <div id="s-hist-list"><div class="empty"><div class="empty-icon">⏳</div>Loading...</div></div>`;
-  try{
-    const r=await fetch(API+`/api/outpass/student/${session.data.student_id}`); const data=await r.json();
+  try{const r=await fetch(API+`/api/outpass/student/${session.data.student_id}`);const data=await r.json();
     const el=document.getElementById('s-hist-list');
     if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">📋</div>No requests yet. <a onclick="showView(\'s-apply\')" style="color:var(--gold);cursor:pointer">Apply now →</a></div>';return}
     el.innerHTML=data.map(op=>renderOpCard(op,'student')).join('');
   }catch{document.getElementById('s-hist-list').innerHTML='<div class="empty"><div class="empty-icon">❌</div>Backend offline.</div>'}
 }
 
-// ═══════════════════════════════════════════════════
-// PARENT
-// ═══════════════════════════════════════════════════
+// ─── Student Complaint Submit ───
+function renderStudentComplaint(pa){
+  pa.innerHTML=`<div class="page-header"><h2>🔧 File a Complaint</h2><p>Report any maintenance issue in your room or hostel</p></div>
+  <div class="card">
+    <form onsubmit="submitComplaint(event)">
+      <div class="form-row">
+        <div class="inp-group"><label class="inp-label">Category *</label>
+          <select class="inp" id="cp-cat" required>
+            <option value="">Select category</option>
+            <option>Plumbing</option><option>Electrical</option><option>Carpentry</option><option>Cleaning</option><option>General</option>
+          </select>
+        </div>
+        <div class="inp-group"><label class="inp-label">Priority</label>
+          <select class="inp" id="cp-pri">
+            <option value="Low">Low</option><option value="Medium" selected>Medium</option><option value="High">High</option>
+          </select>
+        </div>
+      </div>
+      <div class="inp-group"><label class="inp-label">Subject *</label><input class="inp" id="cp-subj" placeholder="Brief title of the issue" required></div>
+      <div class="inp-group"><label class="inp-label">Description *</label><textarea class="inp" id="cp-desc" placeholder="Describe the problem in detail..." style="min-height:100px" required></textarea></div>
+      <div style="background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.2);border-radius:10px;padding:14px;margin-bottom:16px;font-size:12px;color:var(--muted)">
+        ℹ️ Your complaint will go to the <strong style="color:var(--blue)">Warden (Manager)</strong> who will assign a <strong style="color:var(--blue)">Worker</strong>. Once work is done, you confirm completion.
+      </div>
+      <button type="submit" class="btn-gold btn-full" id="cp-submit-btn">📤 Submit Complaint</button>
+    </form>
+  </div>`;
+}
+
+async function submitComplaint(e){
+  e.preventDefault();const btn=document.getElementById('cp-submit-btn');btn.disabled=true;btn.textContent='Submitting...';
+  const payload={student_id:session.data.student_id,category:document.getElementById('cp-cat').value,priority:document.getElementById('cp-pri').value,subject:document.getElementById('cp-subj').value.trim(),description:document.getElementById('cp-desc').value.trim()};
+  try{const r=await fetch(API+'/api/complaint/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const result=await r.json();
+    if(result.success){e.target.reset();toast(result.message);showView('s-comp-history');}else toast(result.message,'e');
+  }catch{toast('Backend offline','e')}
+  btn.disabled=false;btn.textContent='📤 Submit Complaint';
+}
+
+async function renderStudentCompHistory(pa){
+  pa.innerHTML=`<div class="page-header"><h2>📋 My Complaints</h2><p>Track status of your submitted complaints</p></div>
+  <div id="s-comp-list"><div class="empty"><div class="empty-icon">⏳</div>Loading...</div></div>`;
+  try{const r=await fetch(API+`/api/complaint/student/${session.data.student_id}`);const data=await r.json();
+    const el=document.getElementById('s-comp-list');
+    if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔧</div>No complaints filed. <a onclick="showView(\'s-complaint\')" style="color:var(--gold);cursor:pointer">File one →</a></div>';return}
+    el.innerHTML=data.map(c=>renderCompCard(c,'student')).join('');
+  }catch{document.getElementById('s-comp-list').innerHTML='<div class="empty"><div class="empty-icon">❌</div>Backend offline.</div>'}
+}
+
+// ═══════════════ PARENT ═══════════════
 async function renderParentRequests(pa){
   const pid=session.data.parent_id;
   pa.innerHTML=`<div class="page-header"><h2>👪 Outpass Requests</h2><p>Review and approve your child's outpass requests</p></div>
   <div id="p-req-list"><div class="empty"><div class="empty-icon">⏳</div>Loading...</div></div>`;
-  try{
-    const r=await fetch(API+`/api/outpass/parent/${pid}`); const data=await r.json();
+  try{const r=await fetch(API+`/api/outpass/parent/${pid}`);const data=await r.json();
     const el=document.getElementById('p-req-list');
     if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">📋</div>No requests from your child yet.</div>';return}
     el.innerHTML=data.map(op=>renderOpCard(op,'parent')).join('');
   }catch{document.getElementById('p-req-list').innerHTML='<div class="empty"><div class="empty-icon">❌</div>Backend offline.</div>'}
 }
 
-// ═══════════════════════════════════════════════════
-// WARDEN
-// ═══════════════════════════════════════════════════
+// ═══════════════ WARDEN ═══════════════
 async function renderWardenRequests(pa){
   const wid=session.data.warden_id;
   pa.innerHTML=`<div class="page-header"><h2>📋 Outpass Review</h2><p>Parent-approved requests waiting for your decision</p></div>
   <div id="w-req-list"><div class="empty"><div class="empty-icon">⏳</div>Loading...</div></div>`;
-  try{
-    const r=await fetch(API+`/api/outpass/warden/${wid}`); const data=await r.json();
+  try{const r=await fetch(API+`/api/outpass/warden/${wid}`);const data=await r.json();
     const el=document.getElementById('w-req-list');
     if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">📋</div>No requests assigned to you.</div>';return}
     el.innerHTML=data.map(op=>renderOpCard(op,'warden')).join('');
   }catch{document.getElementById('w-req-list').innerHTML='<div class="empty"><div class="empty-icon">❌</div>Backend offline.</div>'}
 }
 
-// ═══════════════════════════════════════════════════
-// WATCHMAN
-// ═══════════════════════════════════════════════════
+async function renderWardenComplaints(pa){
+  const wid=session.data.warden_id;
+  pa.innerHTML=`<div class="page-header"><h2>🔧 Complaint Management</h2><p>Assign workers to resolve student complaints</p></div>
+  <div id="w-comp-list"><div class="empty"><div class="empty-icon">⏳</div>Loading...</div></div>`;
+  try{const r=await fetch(API+`/api/complaint/warden/${wid}`);const data=await r.json();
+    const el=document.getElementById('w-comp-list');
+    if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔧</div>No complaints for your students.</div>';return}
+    el.innerHTML=data.map(c=>renderCompCard(c,'warden')).join('');
+  }catch{document.getElementById('w-comp-list').innerHTML='<div class="empty"><div class="empty-icon">❌</div>Backend offline.</div>'}
+}
+
+// ═══════════════ WATCHMAN ═══════════════
 async function renderWatchmanList(pa){
   pa.innerHTML=`<div class="page-header"><h2>✅ Approved Outpasses</h2><p>Log student exit and entry times</p></div>
   <div id="wm-list"><div class="empty"><div class="empty-icon">⏳</div>Loading...</div></div>`;
-  try{
-    const r=await fetch(API+'/api/outpass/watchman'); const data=await r.json();
+  try{const r=await fetch(API+'/api/outpass/watchman');const data=await r.json();
     const el=document.getElementById('wm-list');
     if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">✅</div>No approved outpasses pending.</div>';return}
     el.innerHTML=data.map(op=>renderOpCard(op,'watchman')).join('');
   }catch{document.getElementById('wm-list').innerHTML='<div class="empty"><div class="empty-icon">❌</div>Backend offline.</div>'}
 }
 
-// ═══════════════════════════════════════════════════
-// OUTPASS CARD RENDERER
-// ═══════════════════════════════════════════════════
+// ═══════════════ OUTPASS CARD ═══════════════
 function renderOpCard(op,role){
-  const badge=statusBadge(op.status);
-  const tl=timeline(op);
-  const actions=opActions(op,role);
-  const remarks=opRemarks(op);
+  const badge=statusBadge(op.status);const tl=opTimeline(op);const actions=opActions(op,role);const remarks=opRemarks(op);
   return `<div class="op-item" id="op-${op.outpass_id}">
-    <div class="op-hdr">
-      <div><div class="op-title">📄 Outpass #${op.outpass_id} — ${op.student_name}</div>
-           <div class="op-meta">${op.roll_number} · ${op.dept} · ${op.year} · ${op.block} Block</div></div>
-      ${badge}
-    </div>
+    <div class="op-hdr"><div><div class="op-title">📄 Outpass #${op.outpass_id} — ${op.student_name}</div><div class="op-meta">${op.roll_number} · ${op.dept} · ${op.year} · ${op.block} Block</div></div>${badge}</div>
     ${tl}
     <div class="op-grid">
       <div class="op-field"><label>🎯 Destination</label><span>${op.destination}</span></div>
@@ -1135,14 +1052,13 @@ function renderOpCard(op,role){
 
 function statusBadge(st){
   const m={PENDING:['b-pending','⏳ Pending'],PARENT_APPROVED:['b-par-approved','✅ Parent OK · Awaiting Warden'],PARENT_REJECTED:['b-par-rejected','❌ Parent Rejected'],WARDEN_APPROVED:['b-war-approved','✅✅ Fully Approved'],WARDEN_REJECTED:['b-war-rejected','❌ Warden Rejected']};
-  const[cls,lbl]=m[st]||['b-pending',st];
-  return `<span class="badge ${cls}">${lbl}</span>`;
+  const[cls,lbl]=m[st]||['b-pending',st];return `<span class="badge ${cls}">${lbl}</span>`;
 }
 
-function timeline(op){
+function opTimeline(op){
   const s=op.status;
   const pd=['PARENT_APPROVED','WARDEN_APPROVED','WARDEN_REJECTED'].includes(s);
-  const pr=s==='PARENT_REJECTED', wa=s==='WARDEN_APPROVED', wr=s==='WARDEN_REJECTED';
+  const pr=s==='PARENT_REJECTED',wa=s==='WARDEN_APPROVED',wr=s==='WARDEN_REJECTED';
   const dot=(done,act,rej,lbl)=>`<div class="tl-step"><div class="tl-dot ${rej?'rej':done?'done':act?'active':''}">${rej?'✕':done?'✓':'●'}</div><div class="tl-lbl">${lbl}</div></div>`;
   const line=done=>`<div class="tl-line ${done?'done':''}"></div>`;
   return `<div class="timeline">
@@ -1156,9 +1072,9 @@ function timeline(op){
 
 function opRemarks(op){
   let h='';
-  if(op.parent_remarks) h+=`<div class="remarks-box"><strong>Parent Remarks</strong>${op.parent_name||'Parent'}: "${op.parent_remarks}"</div>`;
-  if(op.warden_remarks) h+=`<div class="remarks-box"><strong>Warden Remarks</strong>${op.warden_name||'Warden'}: "${op.warden_remarks}"</div>`;
-  if(op.watchman_note) h+=`<div class="remarks-box"><strong>Watchman Note</strong>${op.watchman_note}</div>`;
+  if(op.parent_remarks)h+=`<div class="remarks-box"><strong>Parent Remarks</strong>${op.parent_name||'Parent'}: "${op.parent_remarks}"</div>`;
+  if(op.warden_remarks)h+=`<div class="remarks-box"><strong>Warden Remarks</strong>${op.warden_name||'Warden'}: "${op.warden_remarks}"</div>`;
+  if(op.watchman_note)h+=`<div class="remarks-box"><strong>Watchman Note</strong>${op.watchman_note}</div>`;
   return h;
 }
 
@@ -1177,9 +1093,85 @@ function opActions(op,role){
   return '';
 }
 
-// ═══════════════════════════════════════════════════
-// ACTION MODAL
-// ═══════════════════════════════════════════════════
+// ═══════════════ COMPLAINT CARD ═══════════════
+function compStatusBadge(st){
+  const m={
+    PENDING:['b-pending','⏳ Pending'],
+    ASSIGNED:['b-assigned','👷 Assigned'],
+    IN_PROGRESS:['b-inprogress','🔨 In Progress'],
+    COMPLETED:['b-completed','✅ Completed'],
+    CLOSED:['b-closed','🔒 Closed']
+  };
+  const[cls,lbl]=m[st]||['b-pending',st];return `<span class="badge ${cls}">${lbl}</span>`;
+}
+
+function compTimeline(c){
+  const s=c.status;
+  const assigned=['ASSIGNED','IN_PROGRESS','COMPLETED','CLOSED'].includes(s);
+  const inprog=['IN_PROGRESS','COMPLETED','CLOSED'].includes(s);
+  const done=['COMPLETED','CLOSED'].includes(s);
+  const dot=(d,a,lbl)=>`<div class="tl-step"><div class="tl-dot ${d?'done':a?'active':''}">${d?'✓':'●'}</div><div class="tl-lbl">${lbl}</div></div>`;
+  const line=d=>`<div class="tl-line ${d?'done':''}"></div>`;
+  return `<div class="timeline comp-tl">
+    ${dot(true,false,'Submitted')}
+    ${line(assigned)}${dot(assigned,s==='PENDING','Assigned')}
+    ${line(inprog)}${dot(inprog,assigned&&!inprog,'In Progress')}
+    ${line(done)}${dot(done,inprog&&!done,'Completed')}
+  </div>`;
+}
+
+function renderCompCard(c,role){
+  const catIcons={'Plumbing':'🔧','Electrical':'⚡','Carpentry':'🪚','Cleaning':'🧹','General':'🛠️'};
+  const priCls={'Low':'pri-low','Medium':'pri-medium','High':'pri-high'};
+  let actionsHtml='';
+
+  if(role==='warden'&&c.status==='PENDING'){
+    actionsHtml=`<button class="btn-sm btn-primary" onclick="openAssign(${c.complaint_id},'${c.subject.replace(/'/g,"\\'")}','${c.student_name}')">👷 Assign Worker</button>`;
+  }
+  if(role==='warden'&&c.status==='ASSIGNED'){
+    actionsHtml=`<button class="btn-sm btn-purple" onclick="workerUpdate(${c.complaint_id},'START')">▶ Mark In Progress</button>`;
+  }
+  if(role==='warden'&&c.status==='IN_PROGRESS'){
+    actionsHtml=`<button class="btn-sm btn-success" onclick="workerUpdate(${c.complaint_id},'DONE')">✅ Mark Work Done</button>`;
+  }
+  if(role==='student'&&c.status==='IN_PROGRESS'&&c.work_done_at){
+    actionsHtml=`<button class="btn-sm btn-success" onclick="openConfirm(${c.complaint_id})">✅ Confirm Completion</button>`;
+  }
+  if(role==='admin'&&c.status==='PENDING'){
+    actionsHtml=`<span style="font-size:11px;color:var(--muted)">Pending warden assignment</span>`;
+  }
+
+  const workerBox=c.worker_name?`<div class="worker-assign-box"><strong>👷 Assigned Worker</strong>${c.worker_name} · ${c.worker_phone||''} ${c.manager_note?`<br><em style="color:var(--muted)">"${c.manager_note}"</em>`:''}</div>`:'';
+  const feedbackBox=c.student_feedback?`<div class="remarks-box"><strong>Student Feedback ${c.rating?'('+c.rating+'/5⭐)':''}</strong>"${c.student_feedback}"</div>`:'';
+  const workerNote=c.worker_note?`<div class="remarks-box"><strong>Worker Note</strong>"${c.worker_note}"</div>`:'';
+
+  return `<div class="comp-item" id="comp-${c.complaint_id}">
+    <div class="comp-hdr">
+      <div>
+        <div class="comp-title">${catIcons[c.category]||'🛠️'} Complaint #${c.complaint_id} ${role!=='student'?`— ${c.student_name}`:''}</div>
+        <div class="comp-meta">${role!=='student'?c.roll_number+' · ':''} ${c.block} Block · Room ${c.room_number} · ${fmtDT(c.created_at)}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <span class="priority-chip ${priCls[c.priority]||'pri-medium'}">${c.priority}</span>
+        ${compStatusBadge(c.status)}
+      </div>
+    </div>
+    ${compTimeline(c)}
+    <div class="comp-grid">
+      <div class="comp-field"><label>📌 Subject</label><span>${c.subject}</span></div>
+      <div class="comp-field"><label>🗂 Category</label><span>${c.category}</span></div>
+      <div class="comp-field"><label>📝 Description</label><span>${c.description||'—'}</span></div>
+      ${c.assigned_at?`<div class="comp-field"><label>📅 Assigned At</label><span>${fmtDT(c.assigned_at)}</span></div>`:''}
+      ${c.work_started_at?`<div class="comp-field"><label>▶ Work Started</label><span>${fmtDT(c.work_started_at)}</span></div>`:''}
+      ${c.work_done_at?`<div class="comp-field"><label>✅ Work Done At</label><span>${fmtDT(c.work_done_at)}</span></div>`:''}
+      ${c.student_confirmed_at?`<div class="comp-field"><label>🏆 Confirmed At</label><span>${fmtDT(c.student_confirmed_at)}</span></div>`:''}
+    </div>
+    ${workerBox}${workerNote}${feedbackBox}
+    ${actionsHtml?`<div class="comp-actions">${actionsHtml}</div>`:''}
+  </div>`;
+}
+
+// ═══════════════ ACTION MODAL (OUTPASS) ═══════════════
 function openAction(role,action,opId,name){
   actionCtx={role,action,opId};
   const isApprove=action==='APPROVE';
@@ -1187,21 +1179,17 @@ function openAction(role,action,opId,name){
   document.getElementById('act-sub').textContent=`${isApprove?'Approving':'Rejecting'} outpass for ${name}`;
   document.getElementById('act-remarks').value='';
   document.getElementById('act-btns').innerHTML=`
-    <button class="btn-sm ${isApprove?'btn-success':'btn-danger'}" onclick="submitAction()">
-      ${isApprove?'✅ Confirm Approve':'❌ Confirm Reject'}
-    </button>
+    <button class="btn-sm ${isApprove?'btn-success':'btn-danger'}" onclick="submitAction()">${isApprove?'✅ Confirm Approve':'❌ Confirm Reject'}</button>
     <button class="btn-sm btn-outline" onclick="closeModal('action-modal')">Cancel</button>`;
   openModal('action-modal');
 }
 
 async function submitAction(){
-  const{role,action,opId}=actionCtx;
-  const remarks=document.getElementById('act-remarks').value.trim();
+  const{role,action,opId}=actionCtx;const remarks=document.getElementById('act-remarks').value.trim();
   let url,payload;
   if(role==='parent'){url=API+'/api/outpass/parent/action';payload={outpass_id:opId,parent_id:session.data.parent_id,action,remarks}}
   else{url=API+'/api/outpass/warden/action';payload={outpass_id:opId,warden_id:session.data.warden_id,action,remarks}}
-  try{
-    const r=await fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  try{const r=await fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const result=await r.json();
     if(result.success){closeModal('action-modal');toast(result.message);role==='parent'?renderParentRequests(document.getElementById('page-area')):renderWardenRequests(document.getElementById('page-area'));}
     else toast(result.message,'e');
@@ -1209,50 +1197,92 @@ async function submitAction(){
 }
 
 async function watchmanLog(opId,action){
-  try{
-    const r=await fetch(API+'/api/outpass/watchman/log',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({outpass_id:opId,action,note:`${action==='EXIT'?'Exit':'Return'} logged.`})});
-    const result=await r.json();
-    toast(result.message,result.success?'':'e');
-    if(result.success) renderWatchmanList(document.getElementById('page-area'));
+  try{const r=await fetch(API+'/api/outpass/watchman/log',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({outpass_id:opId,action,note:`${action==='EXIT'?'Exit':'Return'} logged.`})});
+    const result=await r.json();toast(result.message,result.success?'':'e');if(result.success)renderWatchmanList(document.getElementById('page-area'));
   }catch{toast('Backend offline','e')}
 }
 
-// ═══════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════
+// ═══════════════ ASSIGN WORKER MODAL ═══════════════
+async function openAssign(cid,subject,studentName){
+  assignCtx={cid};
+  document.getElementById('assign-modal-sub').textContent=`"${subject}" — ${studentName}`;
+  document.getElementById('assign-note').value='';
+  const sel=document.getElementById('assign-worker-sel');
+  sel.innerHTML='<option value="">Loading...</option>';
+  openModal('assign-modal');
+  try{const r=await fetch(API+'/api/workers');const workers=await r.json();
+    sel.innerHTML='<option value="">Select a worker</option>'+
+      workers.map(w=>`<option value="${w.worker_id}">${w.name} (${w.category}) · ${w.phone}</option>`).join('');
+  }catch{sel.innerHTML='<option value="">Backend offline</option>'}
+}
+
+async function submitAssign(){
+  const workerId=document.getElementById('assign-worker-sel').value;
+  const note=document.getElementById('assign-note').value.trim();
+  if(!workerId){toast('Select a worker','e');return}
+  try{const r=await fetch(API+'/api/complaint/assign',{method:'PUT',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({complaint_id:assignCtx.cid,warden_id:session.data.warden_id,worker_id:parseInt(workerId),note})});
+    const result=await r.json();
+    if(result.success){closeModal('assign-modal');toast(result.message);renderWardenComplaints(document.getElementById('page-area'));}
+    else toast(result.message,'e');
+  }catch{toast('Backend offline','e')}
+}
+
+async function workerUpdate(cid,action){
+  const note=action==='START'?'Work started.':'Work completed by worker. Awaiting student confirmation.';
+  try{const r=await fetch(API+'/api/complaint/worker_update',{method:'PUT',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({complaint_id:cid,action,note})});
+    const result=await r.json();
+    toast(result.message,result.success?'':'e');
+    if(result.success)renderWardenComplaints(document.getElementById('page-area'));
+  }catch{toast('Backend offline','e')}
+}
+
+// ═══════════════ CONFIRM COMPLETION MODAL ═══════════════
+function openConfirm(cid){
+  confirmCtx={cid};selectedRating=0;
+  document.getElementById('confirm-feedback').value='';
+  document.getElementById('confirm-rating').value='0';
+  document.querySelectorAll('.star').forEach(s=>s.classList.remove('lit'));
+  openModal('confirm-modal');
+}
+
+function setRating(n){
+  selectedRating=n;document.getElementById('confirm-rating').value=n;
+  document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('lit',i<n));
+}
+
+async function submitConfirm(){
+  const feedback=document.getElementById('confirm-feedback').value.trim();
+  const rating=parseInt(document.getElementById('confirm-rating').value)||null;
+  try{const r=await fetch(API+'/api/complaint/confirm',{method:'PUT',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({complaint_id:confirmCtx.cid,student_id:session.data.student_id,feedback,rating})});
+    const result=await r.json();
+    if(result.success){closeModal('confirm-modal');toast(result.message);renderStudentCompHistory(document.getElementById('page-area'));}
+    else toast(result.message,'e');
+  }catch{toast('Backend offline','e')}
+}
+
+// ═══════════════ HELPERS ═══════════════
 function fmtDT(dt){
-  if(!dt) return '—';
+  if(!dt)return '—';
   try{return new Date(dt).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}
   catch{return dt}
 }
-
 function openModal(id){document.getElementById(id).classList.add('open')}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
-document.getElementById('alloc-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal('alloc-modal')});
-document.getElementById('action-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal('action-modal')});
-
-function toast(msg,type=''){
-  const el=document.getElementById('toast');
-  el.textContent=msg;
-  el.style.background=type==='e'?'#b91c1c':'#15803d';
-  el.style.color='#fff';
-  el.style.display='block';
-  clearTimeout(el._t);
-  el._t=setTimeout(()=>el.style.display='none',3500);
-}
-
-// Keyboard: Enter to login
-document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&document.getElementById('login-screen').style.display!=='none'){
-    if(selRole&&selRole!=='parent') doLogin();
-  }
+['alloc-modal','action-modal','assign-modal','confirm-modal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal(id)});
 });
+function toast(msg,type=''){
+  const el=document.getElementById('toast');el.textContent=msg;
+  el.style.background=type==='e'?'#b91c1c':'#15803d';el.style.color='#fff';el.style.display='block';
+  clearTimeout(el._t);el._t=setTimeout(()=>el.style.display='none',3500);
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('login-screen').style.display!=='none'&&selRole&&selRole!=='parent')doLogin()});
 
-// ═══════════════════════════════════════════════════
-// BOOT
-// ═══════════════════════════════════════════════════
-initRoomData();
-checkConn();
+// ═══════════════ BOOT ═══════════════
+initRoomData();checkConn();
 </script>
 </body>
 </html>

@@ -1,14 +1,13 @@
 """
 ============================================================
-  HOSTEL MANAGEMENT SYSTEM — Flask Backend v3
+  HOSTEL MANAGEMENT SYSTEM — Flask Backend v2
   File : app.py  |  Run: python app.py  |  http://localhost:5000
 
   Admin    → username=admin  password=admin123
   Student  → roll_number + phone
   Parent   → phone + OTP (OTP shown in toast for demo)
-  Warden   → warden_id  (also handles complaints)
+  Warden   → warden_id
   Watchman → watchman_id
-  Worker   → worker_id
 ============================================================
 """
 from flask import Flask, request, jsonify, send_from_directory
@@ -90,14 +89,6 @@ def auth_login():
             row = cur.fetchone()
             if not row: return jsonify({'success': False, 'message': 'Watchman not found.'}), 401
             return jsonify({'success': True, 'role': 'watchman', 'data': sr(row)})
-
-        elif role == 'worker':
-            wkid = data.get('worker_id')
-            if not wkid: return jsonify({'success': False, 'message': 'Worker ID required.'}), 400
-            cur.execute("SELECT * FROM workers WHERE worker_id=%s AND active=1", (int(wkid),))
-            row = cur.fetchone()
-            if not row: return jsonify({'success': False, 'message': 'Worker not found.'}), 401
-            return jsonify({'success': True, 'role': 'worker', 'data': sr(row)})
 
         return jsonify({'success': False, 'message': f'Unknown role: {role}'}), 400
     except mysql.connector.Error as err:
@@ -296,67 +287,6 @@ def admin_delete_watchman():
         conn.close()
 
 
-# ══════════════════ ADMIN — WORKERS ══════════════════
-
-@app.route('/api/admin/workers', methods=['GET'])
-def admin_get_workers():
-    conn = get_db()
-    if not conn: return jsonify({'error': 'DB failed'}), 500
-    cur = None
-    try:
-        cur = conn.cursor(dictionary=True)
-        cur.execute("SELECT * FROM workers ORDER BY category, worker_id")
-        rows = cur.fetchall()
-        for r in rows: r['created_at'] = str(r.get('created_at',''))
-        return jsonify(rows)
-    finally:
-        if cur: cur.close()
-        conn.close()
-
-
-@app.route('/api/admin/add_worker', methods=['POST'])
-def admin_add_worker():
-    conn = get_db()
-    if not conn: return jsonify({'success': False, 'message': 'DB failed'}), 500
-    cur = None
-    try:
-        d = request.get_json() or {}
-        name=d.get('name','').strip(); phone=d.get('phone','').strip()
-        email=d.get('email','').strip(); category=d.get('category','Other')
-        if not name or not phone: return jsonify({'success': False, 'message': 'Name & phone required.'}), 400
-        cur = conn.cursor(dictionary=True)
-        cur.execute("SELECT worker_id FROM workers WHERE phone=%s",(phone,))
-        if cur.fetchone(): return jsonify({'success': False, 'message': 'Phone already registered!'}), 409
-        cur.execute("INSERT INTO workers(name,email,phone,category) VALUES(%s,%s,%s,%s)",
-                    (name, email or None, phone, category))
-        conn.commit()
-        return jsonify({'success': True, 'message': f'Worker "{name}" added!', 'worker_id': cur.lastrowid}), 201
-    except mysql.connector.Error as err:
-        conn.rollback(); return jsonify({'success': False, 'message': str(err)}), 500
-    finally:
-        if cur: cur.close()
-        conn.close()
-
-
-@app.route('/api/admin/delete_worker', methods=['DELETE'])
-def admin_delete_worker():
-    conn = get_db()
-    if not conn: return jsonify({'success': False, 'message': 'DB failed'}), 500
-    cur = None
-    try:
-        d = request.get_json() or {}
-        wkid = int(d.get('worker_id',0))
-        cur = conn.cursor()
-        cur.execute("DELETE FROM workers WHERE worker_id=%s",(wkid,))
-        conn.commit()
-        return jsonify({'success': cur.rowcount > 0, 'message': 'Worker deleted.' if cur.rowcount else 'Not found.'})
-    except mysql.connector.Error as err:
-        conn.rollback(); return jsonify({'success': False, 'message': str(err)}), 500
-    finally:
-        if cur: cur.close()
-        conn.close()
-
-
 # ══════════════════ ROOM ALLOCATION ══════════════════
 
 @app.route('/api/room_stats', methods=['GET'])
@@ -391,6 +321,7 @@ def allocate_room():
         if cur.fetchone(): return jsonify({'success': False, 'message': 'Student ID exists!'}), 409
         cur.execute("SELECT roll_number FROM students WHERE roll_number=%s",(d['roll_number'],))
         if cur.fetchone(): return jsonify({'success': False, 'message': 'Roll number exists!'}), 409
+        # Parent — find or create by phone
         cur.execute("SELECT parent_id FROM parents WHERE phone=%s",(d['parent_phone'].strip(),))
         par = cur.fetchone()
         if par:
@@ -399,6 +330,7 @@ def allocate_room():
             cur.execute("INSERT INTO parents(name,phone,relation) VALUES(%s,%s,%s)",
                         (d['parent_name'].strip(),d['parent_phone'].strip(),d.get('parent_relation','Parent')))
             parent_id = cur.lastrowid
+        # Warden by year
         yr = d['year'].replace('st Year','').replace('nd Year','').replace('rd Year','').replace('th Year','').strip()
         cur.execute("SELECT warden_id FROM wardens WHERE year=%s LIMIT 1",(yr,))
         w = cur.fetchone(); warden_id = w['warden_id'] if w else None
@@ -408,16 +340,7 @@ def allocate_room():
                      d['dept'].strip(),d['year'].strip(),d['phone'].strip(),
                      d['block'].strip(),int(d['floor']),int(d['room_number']),parent_id,warden_id))
         conn.commit()
-        # Return updated room count for live UI update
-        cur.execute("SELECT COUNT(*) AS cnt FROM students WHERE block=%s AND floor=%s AND room_number=%s",
-                    (d['block'],int(d['floor']),int(d['room_number'])))
-        new_count = cur.fetchone()['cnt']
-        return jsonify({'success': True,
-                        'message': f"Room {d['room_number']} allocated to {d['name']}!",
-                        'new_student_count': new_count,
-                        'block': d['block'],
-                        'floor': int(d['floor']),
-                        'room_number': int(d['room_number'])}), 201
+        return jsonify({'success': True, 'message': f"Room {d['room_number']} allocated to {d['name']}!"}), 201
     except mysql.connector.Error as err:
         conn.rollback()
         if err.errno==1062: return jsonify({'success': False, 'message': 'Duplicate entry.'}), 409
@@ -439,247 +362,6 @@ def get_students():
         rows = cur.fetchall()
         for r in rows: r['created_at']=str(r.get('created_at',''))
         return jsonify(rows)
-    finally:
-        if cur: cur.close()
-        conn.close()
-
-
-# ══════════════════ COMPLAINTS ══════════════════
-# Flow: Student OPEN → Warden ASSIGN worker → Worker IN_PROGRESS → Student COMPLETED
-
-@app.route('/api/complaint/apply', methods=['POST'])
-def complaint_apply():
-    """Student submits a new complaint."""
-    conn = get_db()
-    if not conn: return jsonify({'success': False, 'message': 'DB failed'}), 500
-    cur = None
-    try:
-        d = request.get_json() or {}
-        sid = d.get('student_id','').strip()
-        if not sid: return jsonify({'success': False, 'message': 'student_id required.'}), 400
-        for f in ['subject','category']:
-            if not str(d.get(f,'')).strip():
-                return jsonify({'success': False, 'message': f'Missing: {f}'}), 400
-        cur = conn.cursor(dictionary=True)
-        cur.execute("SELECT * FROM students WHERE student_id=%s", (sid,))
-        stu = cur.fetchone()
-        if not stu: return jsonify({'success': False, 'message': 'Student not found.'}), 404
-        cur.execute("""INSERT INTO complaints
-            (student_id,student_name,roll_number,block,room_number,category,subject,description,status)
-            VALUES(%s,%s,%s,%s,%s,%s,%s,%s,'OPEN')""",
-            (stu['student_id'], stu['name'], stu['roll_number'],
-             stu['block'], stu['room_number'],
-             d['category'], d['subject'].strip(), d.get('description','').strip()))
-        conn.commit()
-        return jsonify({'success': True,
-                        'message': 'Complaint submitted! The warden will assign a worker.',
-                        'complaint_id': cur.lastrowid}), 201
-    except mysql.connector.Error as err:
-        conn.rollback(); return jsonify({'success': False, 'message': str(err)}), 500
-    finally:
-        if cur: cur.close()
-        conn.close()
-
-
-@app.route('/api/complaint/student/<student_id>', methods=['GET'])
-def complaint_student(student_id):
-    """Get all complaints for a student."""
-    conn = get_db()
-    if not conn: return jsonify({'error': 'DB failed'}), 500
-    cur = None
-    try:
-        cur = conn.cursor(dictionary=True)
-        cur.execute("""SELECT c.*, w.name AS worker_name_ref
-                       FROM complaints c
-                       LEFT JOIN workers w ON c.assigned_worker_id=w.worker_id
-                       WHERE c.student_id=%s ORDER BY c.created_at DESC""", (student_id,))
-        return jsonify([sr(r) for r in cur.fetchall()])
-    finally:
-        if cur: cur.close()
-        conn.close()
-
-
-@app.route('/api/complaint/warden/<int:warden_id>', methods=['GET'])
-def complaint_warden(warden_id):
-    """Get all complaints for warden's year group."""
-    conn = get_db()
-    if not conn: return jsonify({'error': 'DB failed'}), 500
-    cur = None
-    try:
-        cur = conn.cursor(dictionary=True)
-        # Get warden's year
-        cur.execute("SELECT year FROM wardens WHERE warden_id=%s", (warden_id,))
-        war = cur.fetchone()
-        if not war: return jsonify({'error': 'Warden not found'}), 404
-        # Get complaints from students of that year
-        cur.execute("""SELECT c.*, w.name AS worker_name_ref
-                       FROM complaints c
-                       JOIN students s ON c.student_id=s.student_id
-                       LEFT JOIN workers w ON c.assigned_worker_id=w.worker_id
-                       WHERE s.year LIKE %s
-                       ORDER BY c.created_at DESC""",
-                    (f'%{war["year"]}%',))
-        return jsonify([sr(r) for r in cur.fetchall()])
-    finally:
-        if cur: cur.close()
-        conn.close()
-
-
-@app.route('/api/complaint/all', methods=['GET'])
-def complaint_all():
-    """Admin: get all complaints."""
-    conn = get_db()
-    if not conn: return jsonify({'error': 'DB failed'}), 500
-    cur = None
-    try:
-        cur = conn.cursor(dictionary=True)
-        cur.execute("""SELECT c.*, w.name AS worker_name_ref
-                       FROM complaints c
-                       LEFT JOIN workers w ON c.assigned_worker_id=w.worker_id
-                       ORDER BY c.created_at DESC""")
-        return jsonify([sr(r) for r in cur.fetchall()])
-    finally:
-        if cur: cur.close()
-        conn.close()
-
-
-@app.route('/api/complaint/workers', methods=['GET'])
-def get_available_workers():
-    """Return active workers list for warden assignment dropdown."""
-    conn = get_db()
-    if not conn: return jsonify({'error': 'DB failed'}), 500
-    cur = None
-    try:
-        cur = conn.cursor(dictionary=True)
-        cur.execute("SELECT worker_id,name,category,phone FROM workers WHERE active=1 ORDER BY category,name")
-        return jsonify(cur.fetchall())
-    finally:
-        if cur: cur.close()
-        conn.close()
-
-
-@app.route('/api/complaint/assign', methods=['PUT'])
-def complaint_assign():
-    """Warden assigns a worker → status ASSIGNED."""
-    conn = get_db()
-    if not conn: return jsonify({'success': False, 'message': 'DB failed'}), 500
-    cur = None
-    try:
-        d = request.get_json() or {}
-        cid = d.get('complaint_id')
-        worker_id = d.get('worker_id')
-        note = d.get('warden_note','').strip()
-        if not cid or not worker_id:
-            return jsonify({'success': False, 'message': 'complaint_id and worker_id required.'}), 400
-        cur = conn.cursor(dictionary=True)
-        cur.execute("SELECT status FROM complaints WHERE complaint_id=%s", (int(cid),))
-        c = cur.fetchone()
-        if not c: return jsonify({'success': False, 'message': 'Complaint not found.'}), 404
-        if c['status'] not in ('OPEN','ASSIGNED'):
-            return jsonify({'success': False, 'message': f"Cannot assign from status: {c['status']}"}), 409
-        cur.execute("SELECT name FROM workers WHERE worker_id=%s AND active=1", (int(worker_id),))
-        wk = cur.fetchone()
-        if not wk: return jsonify({'success': False, 'message': 'Worker not found.'}), 404
-        cur.execute("""UPDATE complaints
-                       SET status='ASSIGNED', assigned_worker_id=%s, assigned_worker_name=%s,
-                           warden_note=%s, assigned_at=%s
-                       WHERE complaint_id=%s""",
-                    (int(worker_id), wk['name'], note, datetime.now(), int(cid)))
-        conn.commit()
-        return jsonify({'success': True, 'message': f'Worker "{wk["name"]}" assigned!'})
-    except mysql.connector.Error as err:
-        conn.rollback(); return jsonify({'success': False, 'message': str(err)}), 500
-    finally:
-        if cur: cur.close()
-        conn.close()
-
-
-@app.route('/api/complaint/worker/start', methods=['PUT'])
-def complaint_worker_start():
-    """Worker marks complaint as IN_PROGRESS."""
-    conn = get_db()
-    if not conn: return jsonify({'success': False, 'message': 'DB failed'}), 500
-    cur = None
-    try:
-        d = request.get_json() or {}
-        cid = d.get('complaint_id')
-        worker_id = d.get('worker_id')
-        note = d.get('worker_note','').strip()
-        if not cid or not worker_id:
-            return jsonify({'success': False, 'message': 'complaint_id and worker_id required.'}), 400
-        cur = conn.cursor(dictionary=True)
-        cur.execute("SELECT * FROM complaints WHERE complaint_id=%s AND assigned_worker_id=%s",
-                    (int(cid), int(worker_id)))
-        c = cur.fetchone()
-        if not c: return jsonify({'success': False, 'message': 'Not found or not assigned to you.'}), 404
-        if c['status'] != 'ASSIGNED':
-            return jsonify({'success': False, 'message': f"Status is already: {c['status']}"}), 409
-        cur.execute("""UPDATE complaints
-                       SET status='IN_PROGRESS', worker_started_at=%s, worker_note=%s
-                       WHERE complaint_id=%s""",
-                    (datetime.now(), note, int(cid)))
-        conn.commit()
-        return jsonify({'success': True, 'message': 'Marked as In Progress!'})
-    except mysql.connector.Error as err:
-        conn.rollback(); return jsonify({'success': False, 'message': str(err)}), 500
-    finally:
-        if cur: cur.close()
-        conn.close()
-
-
-@app.route('/api/complaint/worker/complaints/<int:worker_id>', methods=['GET'])
-def complaint_worker_list(worker_id):
-    """Get complaints assigned to a specific worker."""
-    conn = get_db()
-    if not conn: return jsonify({'error': 'DB failed'}), 500
-    cur = None
-    try:
-        cur = conn.cursor(dictionary=True)
-        cur.execute("""SELECT * FROM complaints
-                       WHERE assigned_worker_id=%s AND status IN ('ASSIGNED','IN_PROGRESS')
-                       ORDER BY created_at DESC""", (worker_id,))
-        return jsonify([sr(r) for r in cur.fetchall()])
-    finally:
-        if cur: cur.close()
-        conn.close()
-
-
-@app.route('/api/complaint/complete', methods=['PUT'])
-def complaint_complete():
-    """Student marks complaint as COMPLETED with optional feedback and rating."""
-    conn = get_db()
-    if not conn: return jsonify({'success': False, 'message': 'DB failed'}), 500
-    cur = None
-    try:
-        d = request.get_json() or {}
-        cid = d.get('complaint_id')
-        sid = d.get('student_id','').strip()
-        feedback = d.get('feedback','').strip()
-        rating = d.get('rating')
-        if not cid or not sid:
-            return jsonify({'success': False, 'message': 'complaint_id and student_id required.'}), 400
-        if rating is not None:
-            try:
-                rating = int(rating)
-                if not 1 <= rating <= 5: raise ValueError
-            except ValueError:
-                return jsonify({'success': False, 'message': 'Rating must be 1–5.'}), 400
-        cur = conn.cursor(dictionary=True)
-        cur.execute("SELECT * FROM complaints WHERE complaint_id=%s AND student_id=%s",
-                    (int(cid), sid))
-        c = cur.fetchone()
-        if not c: return jsonify({'success': False, 'message': 'Not found or not your complaint.'}), 404
-        if c['status'] not in ('ASSIGNED','IN_PROGRESS'):
-            return jsonify({'success': False, 'message': f"Cannot complete from status: {c['status']}"}), 409
-        cur.execute("""UPDATE complaints
-                       SET status='COMPLETED', completed_at=%s,
-                           student_feedback=%s, rating=%s
-                       WHERE complaint_id=%s""",
-                    (datetime.now(), feedback or None, rating, int(cid)))
-        conn.commit()
-        return jsonify({'success': True, 'message': 'Complaint marked as Completed! Thank you.'})
-    except mysql.connector.Error as err:
-        conn.rollback(); return jsonify({'success': False, 'message': str(err)}), 500
     finally:
         if cur: cur.close()
         conn.close()
@@ -891,9 +573,8 @@ def outpass_all():
 
 
 if __name__ == '__main__':
-    print("\n" + "="*60)
-    print("  HOSTEL MANAGEMENT v3 — http://localhost:5000")
-    print("  Admin:   username=admin  password=admin123")
-    print("  Worker:  worker_id (see workers table)")
-    print("="*60+"\n")
+    print("\n" + "="*55)
+    print("  HOSTEL MANAGEMENT v2 — http://localhost:5000")
+    print("  Admin: username=admin  password=admin123")
+    print("="*55+"\n")
     app.run(debug=True, port=5000)
