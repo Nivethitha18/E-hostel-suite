@@ -636,6 +636,7 @@ function openFloor(block,floorIdx){
 function backToBuildings(){
   document.getElementById('building-view').style.display='block';
   const fv=document.getElementById('floor-view');fv.classList.remove('show');fv.innerHTML='';
+  updateBadges();
 }
 
 function renderWing(gridId,startPos,count,row0n){
@@ -660,7 +661,6 @@ function makeRoom(absRoom){
   return box;
 }
 
-// ★ LIVE UI UPDATE after allocation ★
 function updateRoomBoxUI(absRoom){
   const stu=roomData[curBlock][curFloor][absRoom]?.students??0;
   const vac=ROOM_CAP-stu;
@@ -703,20 +703,17 @@ async function submitAlloc(e){
     const res=await fetch(API+'/api/allocate_room',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const result=await res.json();
     if(result.success){
-      // Update local data with server's accurate count
       const newCount=result.new_student_count??roomData[curBlock][curFloor][curRoom].students+1;
       roomData[curBlock][curFloor][curRoom].students=newCount;
       closeModal('alloc-modal');
-      // ★ Live update the room box without full re-render ★
-      updateRoomBoxUI(curRoom);
-      updateBadges();
+      backToBuildings();
       toast(result.message);
       e.target.reset();
     } else {toast(result.message,'e');btn.disabled=false;btn.textContent='✅ Allocate Room';}
   }catch{
-    // Demo mode fallback
     roomData[curBlock][curFloor][curRoom].students=Math.min(ROOM_CAP,roomData[curBlock][curFloor][curRoom].students+1);
-    closeModal('alloc-modal');updateRoomBoxUI(curRoom);updateBadges();
+    closeModal('alloc-modal');
+    backToBuildings();
     toast('Allocated (demo mode)');e.target.reset();
   }
 }
@@ -965,12 +962,21 @@ function renderStudentComplaint(pa){
   </div>`;
 }
 
+// ✅ FIX 1: Changed /api/complaint/submit → /api/complaint/apply
 async function submitComplaint(e){
   e.preventDefault();const btn=document.getElementById('cp-submit-btn');btn.disabled=true;btn.textContent='Submitting...';
-  const payload={student_id:session.data.student_id,category:document.getElementById('cp-cat').value,priority:document.getElementById('cp-pri').value,subject:document.getElementById('cp-subj').value.trim(),description:document.getElementById('cp-desc').value.trim()};
-  try{const r=await fetch(API+'/api/complaint/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const payload={
+    student_id:session.data.student_id,
+    category:document.getElementById('cp-cat').value,
+    priority:document.getElementById('cp-pri').value,
+    subject:document.getElementById('cp-subj').value.trim(),
+    description:document.getElementById('cp-desc').value.trim()
+  };
+  try{
+    const r=await fetch(API+'/api/complaint/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const result=await r.json();
-    if(result.success){e.target.reset();toast(result.message);showView('s-comp-history');}else toast(result.message,'e');
+    if(result.success){e.target.reset();toast(result.message);showView('s-comp-history');}
+    else toast(result.message,'e');
   }catch{toast('Backend offline','e')}
   btn.disabled=false;btn.textContent='📤 Submit Complaint';
 }
@@ -1096,7 +1102,7 @@ function opActions(op,role){
 // ═══════════════ COMPLAINT CARD ═══════════════
 function compStatusBadge(st){
   const m={
-    PENDING:['b-pending','⏳ Pending'],
+    OPEN:['b-pending','⏳ Open'],
     ASSIGNED:['b-assigned','👷 Assigned'],
     IN_PROGRESS:['b-inprogress','🔨 In Progress'],
     COMPLETED:['b-completed','✅ Completed'],
@@ -1114,7 +1120,7 @@ function compTimeline(c){
   const line=d=>`<div class="tl-line ${d?'done':''}"></div>`;
   return `<div class="timeline comp-tl">
     ${dot(true,false,'Submitted')}
-    ${line(assigned)}${dot(assigned,s==='PENDING','Assigned')}
+    ${line(assigned)}${dot(assigned,s==='OPEN','Assigned')}
     ${line(inprog)}${dot(inprog,assigned&&!inprog,'In Progress')}
     ${line(done)}${dot(done,inprog&&!done,'Completed')}
   </div>`;
@@ -1125,23 +1131,21 @@ function renderCompCard(c,role){
   const priCls={'Low':'pri-low','Medium':'pri-medium','High':'pri-high'};
   let actionsHtml='';
 
-  if(role==='warden'&&c.status==='PENDING'){
-    actionsHtml=`<button class="btn-sm btn-primary" onclick="openAssign(${c.complaint_id},'${c.subject.replace(/'/g,"\\'")}','${c.student_name}')">👷 Assign Worker</button>`;
+  // ✅ FIX: Status is 'OPEN' in backend, not 'PENDING'
+  if(role==='warden'&&c.status==='OPEN'){
+    actionsHtml=`<button class="btn-sm btn-primary" onclick="openAssign(${c.complaint_id},'${(c.subject||'').replace(/'/g,"\\'")}','${c.student_name}')">👷 Assign Worker</button>`;
   }
   if(role==='warden'&&c.status==='ASSIGNED'){
-    actionsHtml=`<button class="btn-sm btn-purple" onclick="workerUpdate(${c.complaint_id},'START')">▶ Mark In Progress</button>`;
+    actionsHtml=`<button class="btn-sm btn-purple" onclick="wardenMarkInProgress(${c.complaint_id})">▶ Mark In Progress</button>`;
   }
-  if(role==='warden'&&c.status==='IN_PROGRESS'){
-    actionsHtml=`<button class="btn-sm btn-success" onclick="workerUpdate(${c.complaint_id},'DONE')">✅ Mark Work Done</button>`;
-  }
-  if(role==='student'&&c.status==='IN_PROGRESS'&&c.work_done_at){
+  if(role==='student'&&(c.status==='ASSIGNED'||c.status==='IN_PROGRESS')){
     actionsHtml=`<button class="btn-sm btn-success" onclick="openConfirm(${c.complaint_id})">✅ Confirm Completion</button>`;
   }
-  if(role==='admin'&&c.status==='PENDING'){
+  if(role==='admin'&&c.status==='OPEN'){
     actionsHtml=`<span style="font-size:11px;color:var(--muted)">Pending warden assignment</span>`;
   }
 
-  const workerBox=c.worker_name?`<div class="worker-assign-box"><strong>👷 Assigned Worker</strong>${c.worker_name} · ${c.worker_phone||''} ${c.manager_note?`<br><em style="color:var(--muted)">"${c.manager_note}"</em>`:''}</div>`:'';
+  const workerBox=c.assigned_worker_name?`<div class="worker-assign-box"><strong>👷 Assigned Worker</strong>${c.assigned_worker_name} ${c.warden_note?`<br><em style="color:var(--muted)">"${c.warden_note}"</em>`:''}</div>`:'';
   const feedbackBox=c.student_feedback?`<div class="remarks-box"><strong>Student Feedback ${c.rating?'('+c.rating+'/5⭐)':''}</strong>"${c.student_feedback}"</div>`:'';
   const workerNote=c.worker_note?`<div class="remarks-box"><strong>Worker Note</strong>"${c.worker_note}"</div>`:'';
 
@@ -1152,7 +1156,7 @@ function renderCompCard(c,role){
         <div class="comp-meta">${role!=='student'?c.roll_number+' · ':''} ${c.block} Block · Room ${c.room_number} · ${fmtDT(c.created_at)}</div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-        <span class="priority-chip ${priCls[c.priority]||'pri-medium'}">${c.priority}</span>
+        ${c.priority?`<span class="priority-chip ${priCls[c.priority]||'pri-medium'}">${c.priority}</span>`:''}
         ${compStatusBadge(c.status)}
       </div>
     </div>
@@ -1160,11 +1164,10 @@ function renderCompCard(c,role){
     <div class="comp-grid">
       <div class="comp-field"><label>📌 Subject</label><span>${c.subject}</span></div>
       <div class="comp-field"><label>🗂 Category</label><span>${c.category}</span></div>
-      <div class="comp-field"><label>📝 Description</label><span>${c.description||'—'}</span></div>
+      ${c.description?`<div class="comp-field"><label>📝 Description</label><span>${c.description}</span></div>`:''}
       ${c.assigned_at?`<div class="comp-field"><label>📅 Assigned At</label><span>${fmtDT(c.assigned_at)}</span></div>`:''}
-      ${c.work_started_at?`<div class="comp-field"><label>▶ Work Started</label><span>${fmtDT(c.work_started_at)}</span></div>`:''}
-      ${c.work_done_at?`<div class="comp-field"><label>✅ Work Done At</label><span>${fmtDT(c.work_done_at)}</span></div>`:''}
-      ${c.student_confirmed_at?`<div class="comp-field"><label>🏆 Confirmed At</label><span>${fmtDT(c.student_confirmed_at)}</span></div>`:''}
+      ${c.worker_started_at?`<div class="comp-field"><label>▶ Work Started</label><span>${fmtDT(c.worker_started_at)}</span></div>`:''}
+      ${c.completed_at?`<div class="comp-field"><label>✅ Completed At</label><span>${fmtDT(c.completed_at)}</span></div>`:''}
     </div>
     ${workerBox}${workerNote}${feedbackBox}
     ${actionsHtml?`<div class="comp-actions">${actionsHtml}</div>`:''}
@@ -1210,7 +1213,8 @@ async function openAssign(cid,subject,studentName){
   const sel=document.getElementById('assign-worker-sel');
   sel.innerHTML='<option value="">Loading...</option>';
   openModal('assign-modal');
-  try{const r=await fetch(API+'/api/workers');const workers=await r.json();
+  // ✅ FIX 2: Changed /api/workers → /api/complaint/workers
+  try{const r=await fetch(API+'/api/complaint/workers');const workers=await r.json();
     sel.innerHTML='<option value="">Select a worker</option>'+
       workers.map(w=>`<option value="${w.worker_id}">${w.name} (${w.category}) · ${w.phone}</option>`).join('');
   }catch{sel.innerHTML='<option value="">Backend offline</option>'}
@@ -1220,18 +1224,28 @@ async function submitAssign(){
   const workerId=document.getElementById('assign-worker-sel').value;
   const note=document.getElementById('assign-note').value.trim();
   if(!workerId){toast('Select a worker','e');return}
-  try{const r=await fetch(API+'/api/complaint/assign',{method:'PUT',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({complaint_id:assignCtx.cid,warden_id:session.data.warden_id,worker_id:parseInt(workerId),note})});
+  try{
+    const r=await fetch(API+'/api/complaint/assign',{method:'PUT',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({complaint_id:assignCtx.cid,warden_id:session.data.warden_id,worker_id:parseInt(workerId),warden_note:note})});
     const result=await r.json();
     if(result.success){closeModal('assign-modal');toast(result.message);renderWardenComplaints(document.getElementById('page-area'));}
     else toast(result.message,'e');
   }catch{toast('Backend offline','e')}
 }
 
-async function workerUpdate(cid,action){
-  const note=action==='START'?'Work started.':'Work completed by worker. Awaiting student confirmation.';
-  try{const r=await fetch(API+'/api/complaint/worker_update',{method:'PUT',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({complaint_id:cid,action,note})});
+// ✅ FIX 3: Changed /api/complaint/worker_update → /api/complaint/worker/start
+// Warden marks as In Progress by calling the worker/start endpoint
+async function wardenMarkInProgress(cid){
+  // The backend worker/start endpoint requires worker_id (the assigned worker)
+  // We'll re-fetch the complaint to get the assigned worker id
+  try{
+    // Get all warden complaints to find this complaint's assigned worker
+    const listRes=await fetch(API+`/api/complaint/warden/${session.data.warden_id}`);
+    const list=await listRes.json();
+    const comp=list.find(c=>c.complaint_id===cid);
+    if(!comp||!comp.assigned_worker_id){toast('No worker assigned to this complaint','e');return}
+    const r=await fetch(API+'/api/complaint/worker/start',{method:'PUT',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({complaint_id:cid,worker_id:comp.assigned_worker_id,worker_note:'Work started by warden instruction.'})});
     const result=await r.json();
     toast(result.message,result.success?'':'e');
     if(result.success)renderWardenComplaints(document.getElementById('page-area'));
@@ -1252,11 +1266,13 @@ function setRating(n){
   document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('lit',i<n));
 }
 
+// ✅ FIX 4: Changed /api/complaint/confirm → /api/complaint/complete
 async function submitConfirm(){
   const feedback=document.getElementById('confirm-feedback').value.trim();
   const rating=parseInt(document.getElementById('confirm-rating').value)||null;
-  try{const r=await fetch(API+'/api/complaint/confirm',{method:'PUT',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({complaint_id:confirmCtx.cid,student_id:session.data.student_id,feedback,rating})});
+  try{
+    const r=await fetch(API+'/api/complaint/complete',{method:'PUT',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({complaint_id:confirmCtx.cid,student_id:session.data.student_id,feedback,rating})});
     const result=await r.json();
     if(result.success){closeModal('confirm-modal');toast(result.message);renderStudentCompHistory(document.getElementById('page-area'));}
     else toast(result.message,'e');
